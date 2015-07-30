@@ -67,6 +67,65 @@ At the moment the available tools are:
 
 The config file
 ================
+The config file (config.txt) is located in the FindSV folder. it contains the following fields:
+
+- working_dir=
+the output diretory of the pipeline, the output will be stored in the following fashion:
+working_dir/project/tool/sample
+if the working_dir is set to default, a folder named output will be created in the FindSV directory
+bamfile_location=
+If the bam files are stored in a sub folder inside each project folder, the subfolder path to the bam files are given at the bamfile_location, example:
+
+path/to/project/folders:
+project1/path/to/bam
+project2/path/to/bam
+ptoject3/path/to/bam
+
+then the bamfile_location is set to path/to/bam
+
+available_tools=
+
+the tools available for analysing the bam files. Each have a function with in the script.py file foun inside the module folder.
+
+- excluded_tools=
+
+tools that are not to be used. To exclude CNVnator:
+
+- excluded_tools=CNVnator
+
+if more than one tool is to be excluded, separate the tools with ;
+
+- excluded_tools=CNVnator;FindTranslocations
+
+-account=
+
+the slurm project account, example:
+
+-account=b2011162
+
+Projects may be excluded by adding them to the excluded projects list
+
+excluded_projects=
+
+example
+
+excluded_projects=project1
+
+excluded_projects=project1;project2
+
+The pipeline uses two files to keep track of the analysis of the bam files, the folder of these files is set in the processed line of the config file
+
+processed=
+
+example:
+
+processed=/home/jesper/files
+
+now the logs will be kept inside the /home/jesper/files directory. Processed may also be set to default, then the logs
+will be stored in the FindSV/analysis folder.
+
+
+
 
 
 The reference file

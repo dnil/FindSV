@@ -143,8 +143,8 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("#SBATCH -e {}/fermiKit_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FermiKit_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p node\n")
-        sbatch.write("#SBATCH -t 3-00:00:00\n")
-        sbatch.write("#SBATCH -n 1 \n")
+        sbatch.write("#SBATCH -t 2-00:00:00\n")
+        sbatch.write("#SBATCH -n 2 \n")
 
         sbatch.write("\n");
         sbatch.write("\n");
@@ -160,12 +160,14 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
         sbatch.write("samtools bam2fq $SNIC_TMP/{0}/{1} > $SNIC_TMP/{0}/output.fastq\n".format(sample_name,os.path.split(bam_file)[1]))
-        sbatch.write("fermi2.pl unitig -s3g -t16 -p $SNIC_TMP/{0}/{0} $SNIC_TMP/{0}/output.fastq > $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
+        sbatch.write("fermi2.pl unitig -s3g -t32 -p $SNIC_TMP/{0}/{0} $SNIC_TMP/{0}/output.fastq > $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
 	sbatch.write("make -f $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
 	sbatch.write("echo run_calling\n");
-	sbatch.write("run-calling -t16 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
+	sbatch.write("run-calling -t32 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
 	sbatch.write("cd $SNIC_TMP/{}\n".format(sample_name));
 	sbatch.write("cp *vcf* {}\n".format(local_dir));
+	sbatch.write("cd {}\n".format(local_dir));
+	sbatch.write("gunzip *vcf.gz\n");
 	sbatch.write("echo finished!\n");
         sbatch.write("\n")
         sbatch.write("\n")

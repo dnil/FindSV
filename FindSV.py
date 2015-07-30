@@ -31,7 +31,9 @@ def main(args):
 				if os.path.exists(path_to_sample):
 					for file in os.listdir(path_to_sample):
 						if file.endswith(".bam"):
-							sample_name = file.split(".")[0]          
+							sample_name = file.split(".")[0]
+						else:
+							continue         
 						if sample_name in analysed[tools].keys():
 							# sample state is ANALYSED
 							print "sample {0} ANALYSED".format(sample_name)

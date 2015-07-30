@@ -25,24 +25,24 @@ enter the FindTranslocations folder and compile:
 - make
 
 make FindTranslocations executable:
-===================================
-cd ..
 
-cd bin
+- cd ..
 
-chmod +x FindTranslocations
+- cd bin
+
+- chmod +x FindTranslocations
 
 
 Running
 ========
 First load python 2.7:
 
-module load python/2.7
+- module load python/2.7
 
 
 thereafer FindSV is started:
 
-python FindSV --analysis projectfolders
+- python FindSV --analysis projectfolders
 
 
 where projectfolders is the path to a folder containing folders that contains the bam files.
@@ -50,10 +50,19 @@ where projectfolders is the path to a folder containing folders that contains th
 to analyse only one of the folders, run the pipeline using the following arguments:
 
 
-python FindSV --analysis projectfolders --project runthisproject
+- python FindSV --analysis projectfolders --project runthisproject
 
 
 where runthisfolder is the project folder you wish to run.
+
+The available tools of the pipeline may be listed using the following command
+- python FindSV --list
+
+At the moment the available tools are:
+- Fermikit
+- FindTranslocations
+- CNVnator
+
 
 
 The config file

@@ -1,0 +1,7 @@
+working_directory=default
+bamfile_location=piper_ngi/05_processed_alignments
+available_tools=CNVnator;FindTranslocations;fermiKit
+excluded_tools=
+account=b2011162
+excluded_projects=;P1366_fail;P1366_new;P1366_node;P1366_old;P1426_previous;P1553_old_run;P1775_old_plu;P1775_test
+processed=default

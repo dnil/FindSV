@@ -1,5 +1,6 @@
 # FindSV
 Install
+=======
 Download the pipeline using the following command:
 git clone https://github.com/J35P312/FindSV.git
 
@@ -24,7 +25,7 @@ cmake .. -DBoost_NO_BOOST_CMAKE=ON
 make
 
 make FindTranslocations executable:
-
+===================================
 cd ..
 
 cd bin
@@ -33,7 +34,7 @@ chmod +x FindTranslocations
 
 
 Running
-
+========
 First load python 2.7:
 
 module load python/2.7
@@ -56,9 +57,9 @@ where runthisfolder is the project folder you wish to run.
 
 
 The config file
-
+================
 
 
 The reference file
-
+===================
 

@@ -6,23 +6,23 @@ git clone https://github.com/J35P312/FindSV.git
 
 enter the FindSV/programFiles folder and run the downloadFindTranslocations script:
 
-cd FindSV/programFiles
+- cd FindSV/programFiles
 
-chmod +x downloadFindTranslocations
+- chmod +x downloadFindTranslocations
 
-./downloadFindTranslocations
+- ./downloadFindTranslocations
 
 enter the FindTranslocations folder and compile:
 
-cd FindTranslocations
+- cd FindTranslocations
 
-mkdir build
+- mkdir build
 
-cd build
+- cd build
 
-cmake .. -DBoost_NO_BOOST_CMAKE=ON
+- cmake .. -DBoost_NO_BOOST_CMAKE=ON
 
-make
+- make
 
 make FindTranslocations executable:
 ===================================

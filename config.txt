@@ -1,5 +1,5 @@
 working_directory=default
-bamfile_location=piper_ngi/05_processed_alignments
+bamfile_location=
 available_tools=CNVnator;FindTranslocations;fermiKit
 excluded_tools=
 account=b2011162

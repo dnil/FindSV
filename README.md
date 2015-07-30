@@ -71,4 +71,19 @@ The config file
 
 The reference file
 ===================
+The reference file contains paths leading to the references used by fermikit and CNVnator, the file(references.txt) is found in the FindSV directory and contains the following:
+
+- chromosomes=/proj/b2014152/nobackup/jesperei/references/chromosomes
+- bwa-indexed-ref=/proj/b2014152/nobackup/jesperei/references/concat.fa
+
+chromosomes is used by cnvnator and should contain a refererence file for each chromosome, files should be named in the following manner:
+-chr1
+-chr2
+-
+-
+-
+-chrn
+
+bwa-indexed-ref is used by fermikit, it should contain the path to a bwa inexed reference file
+
 

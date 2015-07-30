@@ -36,7 +36,7 @@ def references(programDirectory,reference):
 		for line in ongoing_fd:
 			reference_type = line.rstrip().split()[0];
 			reference_type=reference_type.split("=");
-			if(reference_type == reference):
+			if(reference_type[0] == reference):
 				referencePath=reference_type[1];
 
 	return(referencePath);
@@ -134,7 +134,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
     #build the sbatch file and submit it
     sbatch_dir,out_dir,err_dir=createFolder(local_dir);
     output_header = os.path.join(local_dir, sample_name)
-    references=references(programDirectory,"bwa-indexed-ref");
+    reference=references(programDirectory,"bwa-indexed-ref");
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
@@ -143,7 +143,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("#SBATCH -e {}/fermiKit_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FermiKit_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p node\n")
-        sbatch.write("#SBATCH -t 2-00:00:00\n")
+        sbatch.write("#SBATCH -t 3-00:00:00\n")
         sbatch.write("#SBATCH -n 1 \n")
 
         sbatch.write("\n");
@@ -163,7 +163,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("fermi2.pl unitig -s3g -t16 -p $SNIC_TMP/{0}/{0} $SNIC_TMP/{0}/output.fastq > $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
 	sbatch.write("make -f $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
 	sbatch.write("echo run_calling\n");
-	sbatch.write("run-calling -t16 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(references,sample_name));
+	sbatch.write("run-calling -t16 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
 	sbatch.write("cd $SNIC_TMP/{}\n".format(sample_name));
 	sbatch.write("cp *vcf* {}\n".format(local_dir));
 	sbatch.write("echo finished!\n");

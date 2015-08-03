@@ -65,12 +65,12 @@ def readConfigFile(programDirectory):
 		else:
 			with open(os.path.join(pathToVariantFiles, "analysed")) as analysed_fd:
 				for sample in analysed_fd:
-					sample = sample.rstrip()
-					analysed[tools][sample] = {"project":project,"outpath":outpath};
+						sample , pid ,project, outpath = sample.rstrip().split()
+						analysed[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
 			with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
 				for sample in ongoing_fd:
 					if(sample[0] != "\n"):
-						project, sample , pid , outpath = sample.rstrip().split()
+						sample , pid ,project, outpath = sample.rstrip().split()
 						ongoing[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
 
     

@@ -40,10 +40,11 @@ def main(args):
 						elif sample_name in ongoing[tools].keys():
 							# sample state is UNDER_ANALYSIS
 							 # check if it is still running in that case delete it from ongoing and add to analysed
-							done=slurm_job.get_slurm_job_status(int(ongoing[tools][sample_name])) 
+							done=slurm_job.get_slurm_job_status(int(ongoing[tools][sample_name]["pid"])) 
 							if done == 0:
+                                                                analysed[tools][sample_name] = ongoing[tools][sample_name]
 								del ongoing[tools][sample_name]
-								analysed[tools][sample_name] = ""
+                                                                
 								print "sample {0} DONE".format(sample_name)
   							else:
 								print "sample {0} RUNNING".format(sample_name)
@@ -53,19 +54,27 @@ def main(args):
 							call="scripts." + tools+"(\""+programDirectory+"\",\""+local_project_dir+"/"+tools+"\",\""+sample_name+"\",\""+os.path.join(path_to_sample, file)+"\",\""+account+"\")"
 							print(call);
 							pid = eval(call)
-							ongoing[tools][sample_name] = pid
+							ongoing[tools][sample_name] = {"pid":pid,"project":project_name,"outpath": local_project_dir}
 							#ongoing[tools][sample_name] = random.randint(1,2000);
 							print "sample {0} LAUNCHED".format(sample_name)
 							#time.sleep(300)
 						#write ongoing to file (rewrite it)
     						with open(os.path.join(processed,"findVariants",tools, "analysed"), 'w') as analysed_fd:
-							for sample, empty in analysed[tools].items():
-								analysed_fd.write("{0} {1} {2}\n".format(sample,project_name,local_project_dir))
+							for sample, dictionary in analysed[tools].items():
+                                                                pid=dictionary["pid"]
+                                                                projectName=dictionary["project"]
+                                                                outPath=dictionary["outpath"]
+
+								analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
 
 						#write analyse to file (rewrite it)
 						with open(os.path.join(processed,"findVariants",tools, "ongoing"), 'w') as ongoing_fd:
-							for sample, pid in ongoing[tools].items():
-								ongoing_fd.write("{0} {1} {2} {3}\n".format(sample, pid,project_name,local_project_dir))
+							for sample, dictionary in ongoing[tools].items():
+                                                                pid=dictionary["pid"]
+                                                                projectName=dictionary["project"]
+                                                                outPath=dictionary["outpath"]
+
+								ongoing_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
 	return
 
 if __name__ == '__main__':

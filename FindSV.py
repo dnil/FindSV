@@ -58,15 +58,14 @@ def main(args):
 							print "sample {0} LAUNCHED".format(sample_name)
 							#time.sleep(300)
 						#write ongoing to file (rewrite it)
-    						with open(os.path.join(processed,tools, "analysed"), 'w') as analysed_fd:
+    						with open(os.path.join(processed,tools,"FindVariants", "analysed"), 'w') as analysed_fd:
 							for sample, empty in analysed[tools].items():
-								analysed_fd.write("{0}\n".format(sample))
+								analysed_fd.write("{0} {1} {2}\n".format(sample,project_name,local_project_dir))
 
 						#write analyse to file (rewrite it)
-						with open(os.path.join(processed,tools, "ongoing"), 'w') as ongoing_fd:
+						with open(os.path.join(processed,tools,"FindVariants", "ongoing"), 'w') as ongoing_fd:
 							for sample, pid in ongoing[tools].items():
-								ongoing_fd.write("{0} {1}\n".format(sample, pid))
-
+								ongoing_fd.write("{0} {1} {2} {3}\n".format(sample, pid,project_name,local_project_dir))
 	return
 
 if __name__ == '__main__':

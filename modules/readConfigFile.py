@@ -44,7 +44,8 @@ def readConfigFile(programDirectory):
 				processed = option[1]
 				#if the processed folder is set to default, it will be placed in the program filder
 				if(processed == "default"):
-					processed=os.path.join(programDirectory,"analysed")
+					processed=os.path.join(programDirectory,"analysed");
+
 
 
 	#remove the excluded tools from the available tools list
@@ -56,20 +57,21 @@ def readConfigFile(programDirectory):
 	for tools in available_tools:
 		analysed[tools]={};
 		ongoing[tools]={};
-		if not (os.path.exists(os.path.join(processed,tools))):
-			os.makedirs(os.path.join(processed,tools))
-			open(os.path.join(processed,tools,"ongoing"), 'a').close()
-			open(os.path.join(processed,tools,"analysed"), 'a').close()
+                pathToVariantFiles=os.path.join(processed,"findVariants",tools);
+		if not (os.path.exists(pathToVariantFiles)):
+			os.makedirs(os.path.join(pathToVariantFiles))
+			open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
+			open(os.path.join(pathToVariantFiles,"analysed"), 'a').close()
 		else:
-			with open(os.path.join(processed,tools, "analysed")) as analysed_fd:
+			with open(os.path.join(pathToVariantFiles, "analysed")) as analysed_fd:
 				for sample in analysed_fd:
 					sample = sample.rstrip()
-					analysed[tools][sample] = "";
-			with open(os.path.join(processed,tools, "ongoing")) as ongoing_fd:
+					analysed[tools][sample] = {"project":project,"outpath":outpath};
+			with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
 				for sample in ongoing_fd:
 					if(sample[0] != "\n"):
-						sample, pid = sample.rstrip().split()
-						ongoing[tools][sample] = pid
+						project, sample , pid , outpath = sample.rstrip().split()
+						ongoing[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
 
     
 	#add the excluded projects to a dictionary

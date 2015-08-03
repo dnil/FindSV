@@ -143,7 +143,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("#SBATCH -e {}/fermiKit_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FermiKit_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p node\n")
-        sbatch.write("#SBATCH -t 2-00:00:00\n")
+        sbatch.write("#SBATCH -t 3-00:00:00\n")
 
         sbatch.write("\n");
         sbatch.write("\n");

@@ -159,10 +159,10 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
         sbatch.write("samtools bam2fq $SNIC_TMP/{0}/{1} > $SNIC_TMP/{0}/output.fastq\n".format(sample_name,os.path.split(bam_file)[1]))
-        sbatch.write("fermi2.pl unitig -s3g -t32 -p $SNIC_TMP/{0}/{0} $SNIC_TMP/{0}/output.fastq > $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
+        sbatch.write("fermi2.pl unitig -s3g -t16 -p $SNIC_TMP/{0}/{0} $SNIC_TMP/{0}/output.fastq > $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
 	sbatch.write("make -f $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
 	sbatch.write("echo run_calling\n");
-	sbatch.write("run-calling -t32 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
+	sbatch.write("run-calling -t16 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
 	sbatch.write("cd $SNIC_TMP/{}\n".format(sample_name));
 	sbatch.write("cp *vcf* {}\n".format(local_dir));
 	sbatch.write("cd {}\n".format(local_dir));

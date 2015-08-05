@@ -57,7 +57,7 @@ def readConfigFile(programDirectory):
 	for tools in available_tools:
 		analysed[tools]={};
 		ongoing[tools]={};
-                pathToVariantFiles=os.path.join(processed,tools);
+                pathToVariantFiles=os.path.join(processed,"findVariants",tools);
 		if not (os.path.exists(pathToVariantFiles)):
 			os.makedirs(os.path.join(pathToVariantFiles))
 			open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()

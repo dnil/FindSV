@@ -19,7 +19,7 @@ def main(args):
 	analysed,ongoing=findVariant.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed);
 
         #function that filters the variant files and constructs databases
-        filtered=applyFilter.applyFilter(programDirectory,analysed,processed,account);
+        filtered=applyFilter.applyFilter(programDirectory,analysed,processed);
 
         #function used to annotate the samples
         finished=annotation.annotation(programDirectory,filtered,processed);

@@ -1,4 +1,11 @@
 # FindSV
+FindSV is a pipeline designed to find structural variations(SVs). It is designed to run on the uppmax system but should work well on other servers using slurm to queue the jobs. 
+
+FindSV accepts the path to a folder containing multiple project folders. Each project folder should store the bam files that the program uses as input for the various tools and scipts used to analyse structural variants.
+
+The pipeline is under construction but may be used to simultaneously run FindTranslocations,CNVnator and fermikit on a large number of samples, the pipeline also creates a database of the found events and counts the occurance of each event from the output of cnvnator and Findtranslocations.
+
+
 Install
 =======
 Download the pipeline using the following command:

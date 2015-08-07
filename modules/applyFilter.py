@@ -1,4 +1,4 @@
-import sys, os, glob
+import sys, os, glob, time
 sys.path.append("calling")
 sys.path.append("filter")
 sys.path.append("modules")
@@ -111,6 +111,7 @@ def applyFilter(programDirectory,analysed,processed,account):
                         for sample in ongoing[variantTool][tools]:
                                 try:
                                         print(ongoing[variantTool][tools][sample]["pid"]);
+                                        time.sleep(10)
                                         done=slurm_job.get_slurm_job_status(int(ongoing[variantTool][tools][sample]["pid"])) 
                                         if done == 0:
                                                 filtered[variantTool][tools][sample] = ongoing[variantTool][tools][sample];

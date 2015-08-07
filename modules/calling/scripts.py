@@ -46,6 +46,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
     #path to the folder were the reference chromosomes are stored
     sbatch_dir,out_dir,err_dir=createFolder(local_dir);
     chrFolder=references(programDirectory,"chromosomes");
+    path2Build = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","build_db.py");
 
     output_header = os.path.join(local_dir, sample_name)
     print( "{0}.slurm".format(sample_name));
@@ -83,7 +84,9 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
 	sbatch.write("cnvnator -root {0}.root -stat 200 >> {1}.cnvnator.log \n".format(output_header,output_header));
 	sbatch.write("cnvnator -root {0}.root -partition 200 \n".format(output_header))
 	sbatch.write("cnvnator -root {0}.root -call 200 > {1}.cnvnator.out \n".format(output_header,output_header));
-	sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.cnvnator.vcf \n".format(output_header,output_header));
+	sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.vcf \n".format(output_header,output_header));
+        sbatch.write("\n")
+        sbatch.write("python {0} --variations {1}.vcf > {2}.db\n".format(path2Build,output_header,output_header) );
         sbatch.write("\n")
         sbatch.write("\n")
 
@@ -95,6 +98,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     sbatch_dir,out_dir,err_dir=createFolder(local_dir);
     output_header = os.path.join(local_dir, sample_name)
     bai_file      = re.sub('m$', 'i', bam_file) # remove the final m and add and i
+    path2Build = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","build_db.py");
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
@@ -103,7 +107,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("#SBATCH -e {}/FT_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FT_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p core\n")
-        sbatch.write("#SBATCH -t 2-00:00:00\n")
+        sbatch.write("#SBATCH -t 3-00:00:00\n")
         sbatch.write("#SBATCH -n 1 \n")
 
         sbatch.write("\n");
@@ -122,7 +126,9 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
         
         sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --min-insert 100 --max-insert 10000 --minimum-supporting-pairs 6 \
-                --orientation innie --output {}'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
+                --orientation innie --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
+
+        sbatch.write("python {0} --variations {1}_inter_chr_events.vcf {1}_intra_chr_events.vcf > {1}.db\n".format(path2Build,output_header) );
 
         sbatch.write("\n")
         sbatch.write("\n")
@@ -143,7 +149,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("#SBATCH -e {}/fermiKit_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FermiKit_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p node\n")
-        sbatch.write("#SBATCH -t 3-00:00:00\n")
+        sbatch.write("#SBATCH -t 6-00:00:00\n")
 
         sbatch.write("\n");
         sbatch.write("\n");

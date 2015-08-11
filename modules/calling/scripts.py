@@ -98,7 +98,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     sbatch_dir,out_dir,err_dir=createFolder(local_dir);
     output_header = os.path.join(local_dir, sample_name)
     bai_file      = re.sub('m$', 'i', bam_file) # remove the final m and add and i
-    if !(os.path.isfile(bai_file)):
+    if not (os.path.isfile(bai_file)):
         bai_file=bam_file+".bai";
 
     path2Build = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","build_db.py");

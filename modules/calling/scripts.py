@@ -68,7 +68,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("module load bioinfo-tools\n")
         sbatch.write("module load bwa\n")
         sbatch.write("module load samtools\n")
-	sbatch.write("module load CNVnator\n")
+        sbatch.write("module load CNVnator\n")
 
         sbatch.write("\n")
         sbatch.write("\n")
@@ -79,12 +79,12 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bam_file, sample_name))
         #sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
         
-	sbatch.write("cnvnator -root {0}.root -tree $SNIC_TMP/{1}/{2} \n".format(output_header,sample_name, os.path.split(bam_file)[1]) );
-	sbatch.write("cnvnator -root {0}.root -his 200 -d {1}\n".format(output_header,chrFolder));
-	sbatch.write("cnvnator -root {0}.root -stat 200 >> {1}.cnvnator.log \n".format(output_header,output_header));
-	sbatch.write("cnvnator -root {0}.root -partition 200 \n".format(output_header))
-	sbatch.write("cnvnator -root {0}.root -call 200 > {1}.cnvnator.out \n".format(output_header,output_header));
-	sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.vcf \n".format(output_header,output_header));
+        sbatch.write("cnvnator -root {0}.root -tree $SNIC_TMP/{1}/{2} \n".format(output_header,sample_name, os.path.split(bam_file)[1]) );
+        sbatch.write("cnvnator -root {0}.root -his 200 -d {1}\n".format(output_header,chrFolder));
+        sbatch.write("cnvnator -root {0}.root -stat 200 >> {1}.cnvnator.log \n".format(output_header,output_header));
+        sbatch.write("cnvnator -root {0}.root -partition 200 \n".format(output_header))
+        sbatch.write("cnvnator -root {0}.root -call 200 > {1}.cnvnator.out \n".format(output_header,output_header));
+        sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.vcf \n".format(output_header,output_header));
         sbatch.write("\n")
         sbatch.write("python {0} --variations {1}.vcf > {2}.db\n".format(path2Build,output_header,output_header) );
         sbatch.write("\n")
@@ -98,6 +98,9 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     sbatch_dir,out_dir,err_dir=createFolder(local_dir);
     output_header = os.path.join(local_dir, sample_name)
     bai_file      = re.sub('m$', 'i', bam_file) # remove the final m and add and i
+    if !(os.path.isfile(bai_file)):
+        bai_file=bam_file+".bai";
+
     path2Build = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","build_db.py");
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
@@ -166,14 +169,14 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
         sbatch.write("samtools bam2fq $SNIC_TMP/{0}/{1} > $SNIC_TMP/{0}/output.fastq\n".format(sample_name,os.path.split(bam_file)[1]))
         sbatch.write("fermi2.pl unitig -s3g -t16 -p $SNIC_TMP/{0}/{0} $SNIC_TMP/{0}/output.fastq > $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
-	sbatch.write("make -f $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
-	sbatch.write("echo run_calling\n");
-	sbatch.write("run-calling -t16 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
-	sbatch.write("cd $SNIC_TMP/{}\n".format(sample_name));
-	sbatch.write("cp *vcf* {}\n".format(local_dir));
-	sbatch.write("cd {}\n".format(local_dir));
-	sbatch.write("gunzip *vcf.gz\n");
-	sbatch.write("echo finished!\n");
+        sbatch.write("make -f $SNIC_TMP/{0}/{0}.mak\n".format(sample_name));
+        sbatch.write("echo run_calling\n");
+        sbatch.write("run-calling -t16 {0} $SNIC_TMP/{1}/{1}.mag.gz | sh\n".format(reference,sample_name));
+        sbatch.write("cd $SNIC_TMP/{}\n".format(sample_name));
+        sbatch.write("cp *vcf* {}\n".format(local_dir));
+        sbatch.write("cd {}\n".format(local_dir));
+        sbatch.write("gunzip *vcf.gz\n");
+        sbatch.write("echo finished!\n");
         sbatch.write("\n")
         sbatch.write("\n")
 

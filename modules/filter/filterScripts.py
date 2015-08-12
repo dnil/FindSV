@@ -30,7 +30,6 @@ def runScripts(analysisTool,tool,analysedProject,analysed,programDirectory,accou
         add2Ongoing={};
 
         call=tool+"(analysisTool,tool,analysedProject,analysed,programDirectory,account)"
-        print(call);
         pid=eval(call);      
 
         for sample in analysedProject:
@@ -39,8 +38,6 @@ def runScripts(analysisTool,tool,analysedProject,analysed,programDirectory,accou
 
 #tool used to build a database over all the events found by a variant call software within one project
 def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account):
-    print("analysed project");
-    print(analysedProject);
      #get the project path  
 
     VCFdictionary={};    
@@ -53,7 +50,6 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
 
     pathToTool=os.path.join(path, analysisTool);
     #find every vcf beloning to an analysed sample
-    print("sample");
     for file in os.listdir(pathToTool):
         if file.endswith(".vcf"):
             filename=file.split(".")[0];
@@ -62,17 +58,23 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
             sample=sample.split("_")
             sample='_'.join(sample[0:N+1])
             
-            print("joined");
-            print(sample);
             if(sample in analysedProject):
                 print("sample in analysed:" + sample);
                 VCFdictionary[sample].append([os.path.join(pathToTool,file) ,filename])
+
+    #find all the features in the feature folder
+    path2FeatureFolder=os.path.join(programDirectory,"feature");
+    featureList="";
+    for file in os.listdir(path2FeatureFolder):
+        if file.endswith(".tab") or file.endswith(".bed") or file.endswith(".txt"):    
+            featureList += " " + os.path.join(path2FeatureFolder,file);
     
     outpath=os.path.join(path,analysisTool,"filtered");
     sbatch_dir,out_dir,err_dir=createFolder(outpath);
 
     
     path2Query = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","query_db.py")
+    path2Features = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","screen_results.py")
     with open(os.path.join(sbatch_dir, "{0}.slurm".format(project)), 'w') as sbatch:
 		
         sbatch.write("#! /bin/bash -l\n")
@@ -87,15 +89,20 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
         sbatch.write("\n")
         #iterate through every analysed sample, query every vcf of the sample against every db
         for sample in analysedProject:
-            print("sample in analysed");
-            print(sample);
             for vcf in VCFdictionary[sample]:
-                print("vcf");
-                print(vcf);
                 filePath=os.path.join(outpath,"{0}.Query.vcf".format(vcf[1]))
                 sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , pathToTool ,filePath) );
+                #add features
+                sbatch.write("\n")
+                feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(vcf[1]));
+                sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
+                sbatch.write("\n")
         sbatch.write("\n")
         sbatch.write("\n")
+
+
+            
+
 
     return ( int(generateSlurmJob(sbatch_dir,project)) );
 

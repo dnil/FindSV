@@ -30,13 +30,13 @@ def applyFilter(programDirectory,analysed,processed,account):
 			        	else:
 			        		excluded_tools=[];
 
-	#remove the excluded tools from the available tools list
-	available_tools=list(set(available_tools) - set(excluded_tools))
+    	#remove the excluded tools from the available tools list
+        available_tools=list(set(available_tools) - set(excluded_tools))
 
         
 
-	filtered={}
-	ongoing={};
+        filtered={}
+        ongoing={};
         #look for the files used to keep track of the processing, if the files exists, read them. If not, create empty files
         for variantTool in analysed:
                 filtered[variantTool]={}
@@ -108,10 +108,11 @@ def applyFilter(programDirectory,analysed,processed,account):
 
 
                         #print the samples undergoing filtration, and update the finished samples
+                        time.sleep(10)
                         for sample in ongoing[variantTool][tools]:
                                 try:
                                         print(ongoing[variantTool][tools][sample]["pid"]);
-                                        time.sleep(10)
+                                        
                                         done=slurm_job.get_slurm_job_status(int(ongoing[variantTool][tools][sample]["pid"])) 
                                         if done == 0:
                                                 filtered[variantTool][tools][sample] = ongoing[variantTool][tools][sample];

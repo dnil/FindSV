@@ -1,0 +1,7 @@
+add files containing genmic features to this folder. The files should be arranged in the following way:
+chrW	startpos	endpos	geneX
+chrZ	startpos	endpos	geney
+
+the files should be saved with the extension bed,txt or tab
+
+Do not add other files with those extensions to the feature folder, otherwise they will be loaded into the pipeline aswell.

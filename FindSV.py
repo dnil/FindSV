@@ -1,6 +1,6 @@
 import sys, os, glob, argparse
 sys.path.append("modules")
-import readConfigFile, findVariant, applyFilter, annotation
+import readConfigFile, findVariant, applyFilter, annotation,database
 
 
 def main(args):
@@ -16,9 +16,13 @@ def main(args):
 		os.makedirs(processed)
 
         #function used to find variants
-	analysed,ongoing=findVariant.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed);
+        analysed,ongoing=findVariant.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed);
 
-        #function that filters the variant files and constructs databases
+        #a function used to build databases from vcf files
+        analysed=database.buildDatabase(programDirectory,analysed,processed,account);
+        
+
+        #function that filters the variant files and finds genomic features of the variants
         filtered=applyFilter.applyFilter(programDirectory,analysed,processed,account);
 
         #function used to annotate the samples

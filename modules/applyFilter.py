@@ -9,60 +9,60 @@ import filterScripts
 
 #function used to apply filters on the varian call files.
 def applyFilter(programDirectory,analysed,processed,account):
-        print("applying filter");
+    print("applying filter");
 	
-        #open the config file to read through the settings
-	with open(os.path.join(programDirectory,"filterconfig.txt")) as ongoing_fd:
-		for line in ongoing_fd:
-			option = line.rstrip().split();
-                        if(len(option) > 0):
-                                option=option[0]
-			        option= option.split("=")
-			        if(option[0] == "available_tools"):
-				        #get a list of the available tools
-				        available_tools = option[1]
-				        available_tools=available_tools.split(";");
-			        if(option[0] == "excluded_tools"):
-			        	#get a list of the excluded tools
-			        	if(len(option) > 1):
-			        		excluded_tools = option[1]
-			        		excluded_tools=excluded_tools.split(";");
-			        	else:
-			        		excluded_tools=[];
+    #open the config file to read through the settings
+    with open(os.path.join(programDirectory,"filterconfig.txt")) as ongoing_fd:
+        for line in ongoing_fd:
+            option = line.rstrip().split();
+            if(len(option) > 0):
+                option=option[0]
+                option= option.split("=")
+                if(option[0] == "available_tools"):
+                    #get a list of the available tools
+                    available_tools = option[1]
+                    available_tools=available_tools.split(";");
+                if(option[0] == "excluded_tools"):
+                    #get a list of the excluded tools
+                    if(len(option) > 1):
+                        excluded_tools = option[1]
+                        excluded_tools=excluded_tools.split(";");
+                    else:
+                        excluded_tools=[];
 
-    	#remove the excluded tools from the available tools list
-        available_tools=list(set(available_tools) - set(excluded_tools))
-
-        
-
-        filtered={}
-        ongoing={};
-        #look for the files used to keep track of the processing, if the files exists, read them. If not, create empty files
-        for variantTool in analysed:
-                filtered[variantTool]={}
-                ongoing[variantTool]={};
-	        for tools in available_tools:
-		        filtered[variantTool][tools]={};
-		        ongoing[variantTool][tools]={};
-                        pathToVariantFiles=os.path.join(processed,variantTool,"filter",tools);
-		        if not (os.path.exists(pathToVariantFiles)):
-		        	os.makedirs(os.path.join(pathToVariantFiles))
-		        	open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
-		        	open(os.path.join(pathToVariantFiles,"filtered"), 'a').close()
-		        else:
-		        	with open(os.path.join(pathToVariantFiles, "filtered")) as analysed_fd:
-		        		for sample in analysed_fd:
-		        				sample , pid ,project, outpath = sample.rstrip().split()
-		        				filtered[variantTool][tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
-		        	with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
-		        		for sample in ongoing_fd:
-		        			if(sample[0] != "\n"):
-		        				sample , pid ,project, outpath = sample.rstrip().split()
-		        				ongoing[variantTool][tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
+    #remove the excluded tools from the available tools list
+    available_tools=list(set(available_tools) - set(excluded_tools))
 
         
-        #itterate through every tool that is available
-        for variantTool in analysed:
+
+    filtered={}
+    ongoing={};
+    #look for the files used to keep track of the processing, if the files exists, read them. If not, create empty files
+    for variantTool in analysed:
+        filtered[variantTool]={}
+        ongoing[variantTool]={};
+        for tools in available_tools:
+            filtered[variantTool][tools]={};
+            ongoing[variantTool][tools]={};
+            pathToVariantFiles=os.path.join(processed,variantTool,"filter",tools);
+            if not (os.path.exists(pathToVariantFiles)):
+                os.makedirs(os.path.join(pathToVariantFiles))
+                open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
+                open(os.path.join(pathToVariantFiles,"filtered"), 'a').close()
+            else:
+                with open(os.path.join(pathToVariantFiles, "filtered")) as analysed_fd:
+                    for sample in analysed_fd:
+                        sample , pid ,project, outpath = sample.rstrip().split()
+                        filtered[variantTool][tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
+                    for sample in ongoing_fd:
+                        if(sample[0] != "\n"):
+                            sample , pid ,project, outpath = sample.rstrip().split()
+                            ongoing[variantTool][tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
+
+        
+    #itterate through every tool that is available
+    for variantTool in analysed:
                 for tools in available_tools:
                         print("filtering the output of {0} using {1}".format(variantTool,tools));
                         filteredProjects = {};
@@ -146,4 +146,4 @@ def applyFilter(programDirectory,analysed,processed,account):
 
                                         ongoing_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
                              
-        return(filtered);
+    return(filtered);

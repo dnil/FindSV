@@ -1,4 +1,3 @@
-available_tools=annovar;screen_results
+available_tools=annovar
 excluded_tools=
 annovar_db=
-screen_results_db=

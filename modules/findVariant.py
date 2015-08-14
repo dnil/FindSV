@@ -50,7 +50,7 @@ def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_t
 							#time.sleep(300)
 						#write ongoing to file (rewrite it)
     						with open(os.path.join(processed,tools, "analysed"), 'w') as analysed_fd:
-							for sample, dictionary in analysed[tools].items():
+							    for sample, dictionary in analysed[tools].items():
                                                                 pid=dictionary["pid"]
                                                                 projectName=dictionary["project"]
                                                                 outPath=dictionary["outpath"]

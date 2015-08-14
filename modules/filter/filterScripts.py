@@ -59,8 +59,9 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
             sample='_'.join(sample[0:N+1])
             
             if(sample in analysedProject):
-                print("sample in analysed:" + sample);
-                VCFdictionary[sample].append([os.path.join(pathToTool,file) ,filename])
+                if(analysisTool != "fermiKit" or ( analysisTool == "fermiKit" and "sv" in file.split(".") )):
+                    print("sample in analysed:" + sample);
+                    VCFdictionary[sample].append([os.path.join(pathToTool,file) ,filename])
 
     #find all the features in the feature folder
     path2FeatureFolder=os.path.join(programDirectory,"feature");
@@ -94,9 +95,10 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
                 sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , pathToTool ,filePath) );
                 #add features
                 sbatch.write("\n")
-                feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(vcf[1]));
-                sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
-                sbatch.write("\n")
+                if featureList != "":
+                    feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(vcf[1]));
+                    sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
+                    sbatch.write("\n")
         sbatch.write("\n")
         sbatch.write("\n")
 

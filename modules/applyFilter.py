@@ -102,8 +102,9 @@ def applyFilter(programDirectory,analysed,processed,account):
                                                 for sample in analysedProjects[project]:
                                                         if project in filteredProjects:
                                                                 if( (sample not in filteredProjects[project] or sample not in filtered[variantTool][tools] ) and project not in ongoingProjects):
-                                                                        add2Ongoing=filterScripts.runScripts(variantTool,tools,analysedProjects[project],analysed,programDirectory,account);
-                                                                        ongoing[variantTool].update(add2Ongoing);
+                                                                        if(sample not in ongoing[variantTool][tools]):
+                                                                            add2Ongoing=filterScripts.runScripts(variantTool,tools,analysedProjects[project],analysed,programDirectory,account);
+                                                                            ongoing[variantTool].update(add2Ongoing);
                                                         
 
 
@@ -138,8 +139,8 @@ def applyFilter(programDirectory,analysed,processed,account):
                                         analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
 
 
-		        with open(os.path.join(processed,variantTool,"filter",tools, "ongoing"), 'w') as ongoing_fd:
-		        	for sample, dictionary in ongoing[variantTool][tools].items():
+                        with open(os.path.join(processed,variantTool,"filter",tools, "ongoing"), 'w') as ongoing_fd:
+                            for sample, dictionary in ongoing[variantTool][tools].items():
                                         pid=dictionary["pid"]
                                         projectName=dictionary["project"]
                                         outPath=dictionary["outpath"]

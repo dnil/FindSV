@@ -94,9 +94,9 @@ def applyFilter(programDirectory,analysed,processed,account):
                                         if(project not in filteredProjects and project not in ongoingProjects):
                                                 if(analysedProjects[project] is not None):
                                                         if(sample not in ongoing[variantTool][tools]):
-                                                        print("submitting project {0} for filtering".format(analysedProjects[project]))
-                                                        add2Ongoing=filterScripts.runScripts(variantTool,tools,analysedProjects[project],analysed,programDirectory,account);
-                                                        ongoing[variantTool][tools].update(add2Ongoing);
+                                                        	print("submitting project {0} for filtering".format(analysedProjects[project]))
+                                                        	add2Ongoing=filterScripts.runScripts(variantTool,tools,analysedProjects[project],analysed,programDirectory,account);
+                                                        	ongoing[variantTool][tools].update(add2Ongoing);
                                         
                                         else:                        
                                         #if the project exists we must check to see if there are any files that were recently finnished

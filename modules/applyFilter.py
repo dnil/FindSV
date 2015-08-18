@@ -93,6 +93,7 @@ def applyFilter(programDirectory,analysed,processed,account):
                                         #if files of the project is analysed, but the project is not filtered and not undergoing filtraton
                                         if(project not in filteredProjects and project not in ongoingProjects):
                                                 if(analysedProjects[project] is not None):
+                                                        if(sample not in ongoing[variantTool][tools]):
                                                         print("submitting project {0} for filtering".format(analysedProjects[project]))
                                                         add2Ongoing=filterScripts.runScripts(variantTool,tools,analysedProjects[project],analysed,programDirectory,account);
                                                         ongoing[variantTool][tools].update(add2Ongoing);
@@ -104,7 +105,7 @@ def applyFilter(programDirectory,analysed,processed,account):
                                                                 if( (sample not in filteredProjects[project] or sample not in filtered[variantTool][tools] ) and project not in ongoingProjects):
                                                                         if(sample not in ongoing[variantTool][tools]):
                                                                             add2Ongoing=filterScripts.runScripts(variantTool,tools,analysedProjects[project],analysed,programDirectory,account);
-                                                                            ongoing[variantTool].update(add2Ongoing);
+                                                                            ongoing[variantTool][tools].update(add2Ongoing);
                                                         
 
 

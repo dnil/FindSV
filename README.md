@@ -49,8 +49,11 @@ First load python 2.7:
 
 The first time a project is run, it neds to be added to the project.txt file. This is a tab separated text file containing the path to the folder were the project folder is located, and the name of the project folder. The project name is assumed to be the same as the folder of the project. The first line of the project.txt file is a header line that starts with #. Thus open the project.txt and add the following lines:
 
+
 Project1  /home/project/
+
 Project2  /home/project/
+
 
 
 if these lines are present in the project.txt file, all samples located in the folders /home/project/Project1 and

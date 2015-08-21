@@ -1,4 +1,4 @@
-import os,subprocess,re,sys
+import os,subprocess,re
 
 #generates a database from the vcf of a sample analysed with a specified tool
 def submit2DB(newsamples,tools,sample,programDirectory,processed,account):

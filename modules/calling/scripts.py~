@@ -68,7 +68,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n")
         sbatch.write("\n")
 
-    return ( int(common.generateSlurmJob(sbatch_dir,sample_name)) );
+    return ( common.int(generateSlurmJob(sbatch_dir,sample_name)) );
 
 #the function used to run FindTranslocations
 def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account):

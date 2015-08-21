@@ -34,15 +34,15 @@ def main(args):
         #function used to find variants
         analysed,ongoing=findVariant.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed);
 
-        #a function used to build databases from vcf files
-        analysed=database.buildDatabase(programDirectory,analysed,processed,account);
+    #a function used to build databases from vcf files
+    analysed=database.buildDatabase(programDirectory,analysed,processed,account);
         
 
-        #function that filters the variant files and finds genomic features of the variants
-        filtered=applyFilter.applyFilter(programDirectory,analysed,processed,account);
+    #function that filters the variant files and finds genomic features of the variants
+    filtered=applyFilter.applyFilter(programDirectory,analysed,processed,account);
 
-        #function used to annotate the samples
-        finished=annotation.annotation(programDirectory,filtered,processed);
+    #function used to annotate the samples
+    finished=annotation.annotation(programDirectory,filtered,processed);
 
     return
 

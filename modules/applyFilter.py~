@@ -108,6 +108,9 @@ def applyFilter(programDirectory,analysed,processed,account):
                                                                             ongoing[variantTool][tools].update(add2Ongoing);
                                                         
 
+
+                        #print the samples undergoing filtration, and update the finished samples
+                        time.sleep(10)
                         for sample in ongoing[variantTool][tools]:
                                 try:
                                         print(ongoing[variantTool][tools][sample]["pid"]);

@@ -15,9 +15,9 @@ def runScripts(analysisTool,tool,analysedProject,analysed,programDirectory,accou
 
 #tool used to build a database over all the events found by a variant call software within one project
 def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account):
-    sys.path.append(os.path.join(programDirectory,"modules"))  
-    import common
-    #get the project path  
+     sys.path.append(os.path.join(programDirectory,"modules"))  
+     import common
+     #get the project path  
 
     VCFdictionary={};    
     for sample in analysedProject:

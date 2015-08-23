@@ -1,8 +1,6 @@
 import sys, os, glob, time
-sys.path.append("calling")
 sys.path.append("filter")
 sys.path.append("modules")
-sys.path.append("modules/calling")
 sys.path.append("modules/filter")
 import common
 import filterScripts
@@ -62,13 +60,13 @@ def applyFilter(programDirectory,analysed,processed,account):
             try:
                 print(ongoing[tool][sample]["pid"]);
                                         
-                    done=common.get_slurm_job_status(int(ongoing[tool][sample]["pid"])) 
-                    if done == 0:
-                        filtered[tool][sample] = ongoing[tool][sample];
+                done=common.get_slurm_job_status(int(ongoing[tool][sample]["pid"])) 
+                if done == 0:
+                    filtered[tool][sample] = ongoing[tool][sample];
                                                                 
                     print "sample {0} DONE".format(sample)
-                    else:
-                        print "sample {0} ONGOING".format(sample)
+                else:
+                    print "sample {0} ONGOING".format(sample)
             except:
                 print("Warning, unnable to get slurm job status for job {}, please try again".format(ongoing[tool][sample]["pid"]));
         #print the filtered samples
@@ -77,6 +75,6 @@ def applyFilter(programDirectory,analysed,processed,account):
             if (sample in ongoing[tool]):
                 del ongoing[tool][sample];
     
-                        common.UpdateProcessFiles(filtered,ongoing,processed,"filter")
+    common.UpdateProcessFiles(filtered,ongoing,processed,"filter")
                              
     return(filtered);

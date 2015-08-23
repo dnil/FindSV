@@ -47,20 +47,31 @@ First load python 2.7:
 - module load python/2.7
 
 
-thereafer FindSV is started:
-
-- python FindSV --analysis projectfolders
+The first time a project is run, it neds to be added to the project.txt file. This is a tab separated text file containing the path to the folder were the project folder is located, and the name of the project folder. The project name is assumed to be the same as the folder of the project. The first line of the project.txt file is a header line that starts with #. Thus open the project.txt and add the following lines:
 
 
-where projectfolders is the path to a folder containing folders that contains the bam files.
+Project1  /home/project/
 
-to analyse only one of the folders, run the pipeline using the following arguments:
-
-
-- python FindSV --analysis projectfolders --project runthisproject
+Project2  /home/project/
 
 
-where runthisfolder is the project folder you wish to run.
+
+if these lines are present in the project.txt file, all samples located in the folders /home/project/Project1 and
+/home/project/Project2 will be analysed by the pipeline
+
+
+The pipeline is started using the following command:
+
+- python FindSV
+
+
+to analyse only one of the projects, run the pipeline using the following arguments:
+
+
+- python FindSV --project runthisproject
+
+
+where runthisfolder is the project you wish to run.
 
 The available tools of the pipeline may be listed using the following command
 - python FindSV --list

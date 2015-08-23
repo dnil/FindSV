@@ -68,7 +68,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n")
         sbatch.write("\n")
 
-    return ( common.int(generateSlurmJob(sbatch_dir,sample_name)) );
+    return ( int(common.generateSlurmJob(sbatch_dir,sample_name)) );
 
 #the function used to run FindTranslocations
 def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account):
@@ -129,7 +129,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("#SBATCH -e {}/fermiKit_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FermiKit_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p node\n")
-        sbatch.write("#SBATCH -t 6-00:00:00\n")
+        sbatch.write("#SBATCH -t 3-12:00:00\n")
 
         sbatch.write("\n");
         sbatch.write("\n");

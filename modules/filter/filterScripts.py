@@ -1,20 +1,18 @@
 import sys, os, glob,subprocess,re
 
 #module used to filter the cariant call files
-def runScripts(analysisTool,tool,analysedProject,analysed,programDirectory,account):
+def runScripts(analysisTool,analysedProject,analysed,programDirectory,account):
 
 
         add2Ongoing={};
-
-        call=tool+"(analysisTool,tool,analysedProject,analysed,programDirectory,account)"
-        pid=eval(call);      
+        pid=build_DB(analysisTool,analysedProject,analysed,programDirectory,account)
 
         for sample in analysedProject:
                         add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool][sample]["outpath"],"project":analysed[analysisTool][sample]["project"]}});
 	return add2Ongoing;
 
 #tool used to build a database over all the events found by a variant call software within one project
-def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account):
+def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
     #get the project path  
@@ -59,9 +57,9 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
 		
         sbatch.write("#! /bin/bash -l\n")
         sbatch.write("#SBATCH -A {}\n".format(account))
-        sbatch.write("#SBATCH -o {0}/buildDB_{1}.out\n".format(out_dir,project))
-        sbatch.write("#SBATCH -e {0}/buildDB_{1}.err\n".format(err_dir,project))
-        sbatch.write("#SBATCH -J buildDB_{0}_{1}.job\n".format(project,analysisTool))
+        sbatch.write("#SBATCH -o {0}/filter_{1}.out\n".format(out_dir,project))
+        sbatch.write("#SBATCH -e {0}/filter_{1}.err\n".format(err_dir,project))
+        sbatch.write("#SBATCH -J filter_{0}_{1}.job\n".format(project,analysisTool))
         sbatch.write("#SBATCH -p core\n")
         sbatch.write("#SBATCH -t 5:00:00\n")
         sbatch.write("#SBATCH -n 1 \n")
@@ -71,7 +69,7 @@ def build_DB(analysisTool,tool,analysedProject,analysed,programDirectory,account
         for sample in analysedProject:
             for vcf in VCFdictionary[sample]:
                 filePath=os.path.join(outpath,"{0}.Query.vcf".format(vcf[1]))
-                sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , pathToTool ,filePath) );
+                sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , os.path.join(pathToTool,"database") ,filePath) );
                 #add features
                 sbatch.write("\n")
                 if featureList != "":

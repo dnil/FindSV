@@ -50,28 +50,6 @@ def readConfigFile(programDirectory):
 
 	#remove the excluded tools from the available tools list
 	available_tools=list(set(available_tools) - set(excluded_tools))
-	#read through the analysed and ongoing samples, or create files if such files are not existing
-	analysed={}
-	ongoing={};
-
-	for tools in available_tools:
-		analysed[tools]={};
-		ongoing[tools]={};
-                pathToVariantFiles=os.path.join(processed,tools);
-		if not (os.path.exists(pathToVariantFiles)):
-			os.makedirs(os.path.join(pathToVariantFiles))
-			open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
-			open(os.path.join(pathToVariantFiles,"analysed"), 'a').close()
-		else:
-			with open(os.path.join(pathToVariantFiles, "analysed")) as analysed_fd:
-				for sample in analysed_fd:
-						sample , pid ,project, outpath = sample.rstrip().split()
-						analysed[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
-			with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
-				for sample in ongoing_fd:
-					if(sample[0] != "\n"):
-						sample , pid ,project, outpath = sample.rstrip().split()
-						ongoing[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
 
     
 	#add the excluded projects to a dictionary
@@ -79,4 +57,4 @@ def readConfigFile(programDirectory):
 	for projects in excluded_projects:
 		exclude[projects]="";
 
-	return(working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed)
+	return(working_dir,path_to_bam,available_tools,account,exclude,processed)

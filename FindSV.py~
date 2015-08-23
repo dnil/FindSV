@@ -1,6 +1,33 @@
 import sys, os, glob, argparse
 sys.path.append("modules")
-import readConfigFile, findVariant, applyFilter, annotation,database
+import readConfigFile, calling, filter, annotation,database
+
+
+def initiateProcessFile(available_tools,processed):
+	
+    analysed={}
+    ongoing={};
+    #read through the analysed and ongoing samples, or create files if such files are not existing
+    for tools in available_tools:
+        analysed[tools]={};
+        ongoing[tools]={};
+        pathToVariantFiles=os.path.join(processed,tools,calling);
+        if not (os.path.exists(pathToVariantFiles)):
+            os.makedirs(os.path.join(pathToVariantFiles))
+            open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
+            open(os.path.join(pathToVariantFiles,"analysed"), 'a').close()
+        else:
+            with open(os.path.join(pathToVariantFiles,"analysed")) as analysed_fd:
+                for sample in analysed_fd:
+                    sample , pid ,project, outpath = sample.rstrip().split()
+                    analysed[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
+            with open(os.path.join(pathToVariantFiles,"ongoing")) as ongoing_fd:
+                for sample in ongoing_fd:
+                    if(sample[0] != "\n"):
+                        sample , pid ,project, outpath = sample.rstrip().split()
+                        ongoing[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
+
+    return(analysed,ongoing);
 
 
 def main(args):
@@ -20,29 +47,33 @@ def main(args):
         projects=tmpProject;  
     
 	#read the config file
-    working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed=readConfigFile.readConfigFile(programDirectory)
+    working_dir,path_to_bam,available_tools,account,exclude,processed=readConfigFile.readConfigFile(programDirectory)
 
-    #create a directory to keep track of the analysed files
-    if not (os.path.exists(processed)):
-        os.makedirs(processed)
+
 
     for project in projects:
-
         analysis=projects[project];
         projectToProcess=project;
+        processFilesPath=os.path.join(processed,project)
+        #create a directory to keep track of the analysed files
+        if not (os.path.exists(processFilesPath)):
+            os.makedirs(processFilesPath)
+
+        #initate the analysed and ongoing dictionaries
+        analysed,ongoing=initiateProcessFile(available_tools,processFilesPath);
 
         #function used to find variants
-        analysed,ongoing=findVariant.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processed);
+        analysed,ongoing=calling.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processFilesPath);
 
-    #a function used to build databases from vcf files
-    analysed=database.buildDatabase(programDirectory,analysed,processed,account);
+        #a function used to build databases from vcf files
+        analysed=database.buildDatabase(programDirectory,analysed,processFilesPath,account);
         
 
-    #function that filters the variant files and finds genomic features of the variants
-    filtered=applyFilter.applyFilter(programDirectory,analysed,processed,account);
+        #function that filters the variant files and finds genomic features of the variants
+        analysed=filter.applyFilter(programDirectory,analysed,processFilesPath,account);
 
-    #function used to annotate the samples
-    finished=annotation.annotation(programDirectory,filtered,processed);
+        #function used to annotate the samples
+        analysed=annotation.annotation(programDirectory,analysed,processFilesPath);
 
     return
 

@@ -1,4 +1,6 @@
-import sys, os, glob,subprocess,re
+import sys, os, glob,re
+import subprocess
+import shlex
 
 
 #this function is used to create a folder to keep the output of each tool
@@ -23,3 +25,105 @@ def generateSlurmJob(sbatch_dir,sample_name):
         return( re.match(r'Submitted batch job (\d+)', p_out).groups()[0] );
     except AttributeError:
         raise RuntimeError('Could not submit sbatch')
+
+#read the ongoing or analysis files or create empty files
+def readProcessFiles(analysed,processed,step):
+    finished={}
+    ongoing={};
+    #look for the files used to keep track of the processing, if the files exists, read them. If not, create empty files
+    for tool in analysed:
+        finished[tool]={}
+        ongoing[tool]={}
+        pathToVariantFiles=os.path.join(processed,tool,step);
+
+        if not (os.path.exists(pathToVariantFiles)):
+            os.makedirs(os.path.join(pathToVariantFiles))
+            open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
+            open(os.path.join(pathToVariantFiles,"analysed"), 'a').close()
+
+        else:
+            with open(os.path.join(pathToVariantFiles, "analysed")) as analysed_fd:
+                for sample in analysed_fd:
+                    sample , pid ,project, outpath = sample.rstrip().split()
+                    finished[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+            with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
+                for sample in ongoing_fd:
+                    if(sample[0] != "\n"):
+	                    sample , pid ,project, outpath = sample.rstrip().split()
+	                    ongoing[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+
+    return(finished,ongoing)
+
+#update the ongoing and analysesd files
+def UpdateProcessFiles(analysed,ongoing,processed,step):
+
+    #update the process files and return the finished dictionary
+    for tools in analysed:
+        pathToVariantFiles=os.path.join(processed,tools,step);
+        with open(os.path.join(pathToVariantFiles, "analysed"), 'w') as analysed_fd:
+            for sample, dictionary in analysed[tools].items():
+                    pid=dictionary["pid"]
+                    projectName=dictionary["project"]
+                    outPath=dictionary["outpath"]
+                    analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
+
+
+    for tools in ongoing:
+        pathToVariantFiles=os.path.join(processed,tools,step);
+        with open(os.path.join(pathToVariantFiles, "ongoing"), 'w') as ongoing_fd:
+            for sample, dictionary in ongoing[tools].items():
+                pid=dictionary["pid"]
+                projectName=dictionary["project"]
+                outPath=dictionary["outpath"]
+                ongoing_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
+
+
+#get the status of the slurm jobs
+def get_slurm_job_status(slurm_job_id):
+    """Gets the State of a SLURM job and returns it as an integer (or None).
+    :param int slurm_job_id: An integer of your choosing
+    :returns: The status of the job (None == Queued/Running, 0 == Success, 1 == Failure)
+    :rtype: None or int
+    :raises TypeError: If the input is not/cannot be converted to an int
+    :raises ValueError: If the slurm job ID is not found
+    :raises RuntimeError: If the slurm job status is not understood
+    """
+
+    SLURM_EXIT_CODES = {"PENDING": 1,
+                        "RUNNING": 1,
+                        "RESIZING": 1,
+                        "SUSPENDED": 1,
+                        "COMPLETED": 0,
+                        "CANCELLED": 0,
+                        "FAILED": 0,
+                        "TIMEOUT": 0,
+                        "PREEMPTED": 0,
+                        "BOOT_FAIL": 0,
+                        "NODE_FAIL": 0,
+                        }
+
+    try:
+        check_cl = "sacct -n -j {0} -o STATE".format(slurm_job_id)
+        # If the sbatch job has finished, this returns two lines. For example:
+        # $ sacct -j 3655032
+        #       JobID    JobName  Partition    Account  AllocCPUS      State ExitCode 
+        #       ------------ ---------- ---------- ---------- ---------- ---------- -------- 
+        #       3655032      test_sbat+       core   a2010002          1  COMPLETED      0:0 
+        #       3655032.bat+      batch              a2010002          1  COMPLETED      0:0 
+        #
+        # In this case I think we want the first one but I'm actually still not
+        # totally clear on this point -- the latter may be the return code of the
+        # actual sbatch command for the bash interpreter? Unclear.
+    except ValueError:
+        raise TypeError("SLURM Job ID not an integer: {0}".format(slurm_job_id))
+    job_status = subprocess.check_output(shlex.split(check_cl))
+    print 'job status for job {0} is "{1}"'.format(slurm_job_id, job_status.strip().split()[0])
+    if not job_status:
+        raise ValueError("No such slurm job found: {0}".format(slurm_job_id))
+    else:
+        try:
+            return SLURM_EXIT_CODES[job_status.split()[0].strip("+")]
+        except (IndexError, KeyError, TypeError) as e:
+            print("SLURM job status not understood: {0}".format(job_status))
+
+

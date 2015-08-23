@@ -10,15 +10,14 @@ def submit2DB(newsamples,tools,sample,programDirectory,processed,account):
     samplePath=os.path.join(newsamples[tools][sample]["outpath"],tools)
     path2Build = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","build_db.py");
 
-    sbatch_dir = os.path.join(samplePath, "sbatch")
-    out_dir    = os.path.join(samplePath, "sbatch_out")
-    err_dir    = os.path.join(samplePath, "sbatch_err")
+    outpath=os.path.join(samplePath,"database");
+    sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
 
     fileString=""
     for file in fileExtensions[tools]:
         fileString += " " + os.path.join(samplePath,sample+file)
 
-    with open(os.path.join(sbatch_dir, "DB_{}.slurm".format(sample)), 'w') as sbatch:
+    with open(os.path.join(sbatch_dir, "{}.slurm".format(sample)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
         sbatch.write("#SBATCH -A {}\n".format(account))
         sbatch.write("#SBATCH -o {}/DB_{}.out\n".format(out_dir,sample))
@@ -30,7 +29,7 @@ def submit2DB(newsamples,tools,sample,programDirectory,processed,account):
 
         sbatch.write("\n");
         sbatch.write("\n");
-        DBpath=os.path.join(samplePath,sample+".db")
+        DBpath=os.path.join(samplePath,"database",sample+".db")
         sbatch.write("python {0} --variations {1} --tollerance  1000 > {2}\n".format(path2Build,fileString,DBpath) );
 
         sbatch.write("\n")

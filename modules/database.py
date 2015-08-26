@@ -17,7 +17,6 @@ def buildDatabase(programDirectory,analysed,processed,account):
         for sample in analysed[tool]:
             if sample not in ongoing[tool] and sample not in databaseFinished[tool]:
                 newsamples[tool].update({sample:analysed[tool][sample]})
-                time.sleep(10)
 
 
     #check if any of the ongoing samples are finished, and add finished samples to the finished dictionary
@@ -25,6 +24,8 @@ def buildDatabase(programDirectory,analysed,processed,account):
     for tools in ongoing:
         for sample in ongoing[tools]:
             try:
+                print(sample)
+                time.sleep(10)
                 done=common.get_slurm_job_status(int(ongoing[tools][sample]["pid"])) 
                 if done == 0:
                     databaseFinished[tools].update({sample:ongoing[tools][sample]})  

@@ -24,8 +24,6 @@ def buildDatabase(programDirectory,analysed,processed,account):
     for tools in ongoing:
         for sample in ongoing[tools]:
             try:
-                print(sample)
-                time.sleep(5)
                 done=common.get_slurm_job_status(int(ongoing[tools][sample]["pid"])) 
                 if done == 0:
                     databaseFinished[tools].update({sample:ongoing[tools][sample]})  

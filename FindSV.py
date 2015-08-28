@@ -73,7 +73,7 @@ def main(args):
         analysed=filter.applyFilter(programDirectory,analysed,processFilesPath,account);
 
         #function used to annotate the samples
-        analysed=annotation.annotation(programDirectory,analysed,processFilesPath);
+        analysed=annotation.annotation(programDirectory,analysed,processFilesPath,account);
 
     return
 

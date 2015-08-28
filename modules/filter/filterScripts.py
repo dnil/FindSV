@@ -2,14 +2,8 @@ import sys, os, glob,subprocess,re
 
 #module used to filter the cariant call files
 def runScripts(analysisTool,analysedProject,analysed,programDirectory,account):
-
-
-        add2Ongoing={};
-        pid=build_DB(analysisTool,analysedProject,analysed,programDirectory,account)
-
-        for sample in analysedProject:
-                        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool][sample]["outpath"],"project":analysed[analysisTool][sample]["project"]}});
-	return add2Ongoing;
+    add2Ongoing=build_DB(analysisTool,analysedProject,analysed,programDirectory,account)
+    return add2Ongoing;
 
 #tool used to build a database over all the events found by a variant call software within one project
 def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
@@ -67,21 +61,30 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
         sbatch.write("\n")
         #iterate through every analysed sample, query every vcf of the sample against every db
         for sample in analysedProject:
+            FileName=[]
+            i=0;
             for vcf in VCFdictionary[sample]:
+                FileName.append("");
                 filePath=os.path.join(outpath,"{0}.Query.vcf".format(vcf[1]))
                 sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , os.path.join(pathToTool,"database") ,filePath) );
+                FileName[i]="{0};.Query.vcf".format(vcf[1])
                 #add features
                 sbatch.write("\n")
                 if featureList != "":
                     feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(vcf[1]));
                     sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
                     sbatch.write("\n")
+                    FileName[i]="{0};.Feature.vcf".format(vcf[1])
+                i=i+1
+            analysed[analysisTool][sample]["outputFile"]="\t".join(FileName);
         sbatch.write("\n")
         sbatch.write("\n")
 
 
-            
-
-
-    return ( int(common.generateSlurmJob(sbatch_dir,project)) );
+    add2Ongoing={};
+    pid = int(common.generateSlurmJob(sbatch_dir,project))
+    for sample in analysedProject:
+        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool][sample]["outpath"],"project":analysed[analysisTool][sample]["project"],"outputFile":analysed[analysisTool][sample]["outputFile"]}});
+    
+    return (add2Ongoing);
 

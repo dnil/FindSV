@@ -53,7 +53,7 @@ def applyFilter(programDirectory,analysed,processed,account):
                         if( (sample not in filteredProjects[project] or sample not in filtered[tool] ) and project not in ongoingProjects):
                             if(sample not in ongoing[tool]):
                                 add2Ongoing=filterScripts.runScripts(tool,analysedProjects[project],analysed,programDirectory,account);
-                                ongoing[tools].update(add2Ongoing);
+                                ongoing[tool].update(add2Ongoing);
                                                         
 
         for sample in ongoing[tool]:

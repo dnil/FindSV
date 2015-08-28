@@ -1,3 +1,0 @@
-available_tools=annovar
-excluded_tools=
-annovar_db=

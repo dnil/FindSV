@@ -44,13 +44,30 @@ def readProcessFiles(analysed,processed,step):
         else:
             with open(os.path.join(pathToVariantFiles, "analysed")) as analysed_fd:
                 for sample in analysed_fd:
-                    sample , pid ,project, outpath = sample.rstrip().split()
-                    finished[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+
+                    row = sample.rstrip().split()
+                    sample=row[0];
+                    pid=row[1]
+                    project=row[2]
+                    outpath=row[3]
+                    if len(row) == 4:
+                        finished[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                    else:
+                        outputFile=row[4]
+                        finished[tool][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
             with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
                 for sample in ongoing_fd:
                     if(sample[0] != "\n"):
-	                    sample , pid ,project, outpath = sample.rstrip().split()
-	                    ongoing[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                        row = sample.rstrip().split()
+                        sample=row[0];
+                        pid=row[1]
+                        project=row[2]
+                        outpath=row[3]
+                        if len(row) == 4:
+	                        ongoing[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                        else:
+                            outputFile=row[4]
+                            ongoing[tool][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
 
     return(finished,ongoing)
 
@@ -65,8 +82,11 @@ def UpdateProcessFiles(analysed,ongoing,processed,step):
                     pid=dictionary["pid"]
                     projectName=dictionary["project"]
                     outPath=dictionary["outpath"]
-                    analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
-
+                    if not "outputFile" in dictionary: 
+                        analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
+                    else:
+                        outputFile=dictionary["outputFile"]
+                        analysed_fd.write("{0} {1} {2} {3} {4}\n".format(sample,pid ,projectName,outPath,outputFile))
 
     for tools in ongoing:
         pathToVariantFiles=os.path.join(processed,tools,step);
@@ -75,8 +95,11 @@ def UpdateProcessFiles(analysed,ongoing,processed,step):
                 pid=dictionary["pid"]
                 projectName=dictionary["project"]
                 outPath=dictionary["outpath"]
-                ongoing_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
-
+                if not "outputFile" in dictionary:
+                    ongoing_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
+                else:
+                    outputFile=dictionary["outputFile"]
+                    ongoing_fd.write("{0} {1} {2} {3} {4}\n".format(sample,pid ,projectName,outPath,outputFile))
 
 #get the status of the slurm jobs
 def get_slurm_job_status(slurm_job_id):

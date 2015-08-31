@@ -88,7 +88,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("#SBATCH -e {}/FT_{}.err\n".format(err_dir,sample_name))
         sbatch.write("#SBATCH -J FT_{}.job\n".format(sample_name))
         sbatch.write("#SBATCH -p core\n")
-        sbatch.write("#SBATCH -t 3-00:00:00\n")
+        sbatch.write("#SBATCH -t 2-00:00:00\n")
         sbatch.write("#SBATCH -n 1 \n")
 
         sbatch.write("\n");
@@ -106,7 +106,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
         
-        sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --min-insert 100 --max-insert 10000 --minimum-supporting-pairs 6 \
+        sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 6 \
                 --orientation innie --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
         sbatch.write("\n")
         sbatch.write("\n")

@@ -10,7 +10,7 @@ def annotation(programDirectory,filtered,processed,account):
         analysed,ongoing=common.readProcessFiles(filtered,processed,"annotation")
         for tools in filtered: 
              print("annotation: "+tools);
-            for sample in filtered[tools]:
+             for sample in filtered[tools]:
                 if sample in ongoing[tools]:
                     #check the status of the ongoing sample;
                     done=common.get_slurm_job_status(int(ongoing[tools][sample]["pid"])) 

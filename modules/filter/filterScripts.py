@@ -55,7 +55,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
         sbatch.write("#SBATCH -e {0}/filter_{1}.err\n".format(err_dir,project))
         sbatch.write("#SBATCH -J filter_{0}_{1}.job\n".format(project,analysisTool))
         sbatch.write("#SBATCH -p core\n")
-        sbatch.write("#SBATCH -t 5:00:00\n")
+        sbatch.write("#SBATCH -t 2-00:00:00\n")
         sbatch.write("#SBATCH -n 1 \n")
         sbatch.write("\n")
         sbatch.write("\n")

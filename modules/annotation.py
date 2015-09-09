@@ -26,9 +26,11 @@ def annotation(programDirectory,filtered,processed,account):
                     print("analysed: " + sample);
                 else:
                     print("submitting: " + sample);
-                    outgoing=annotationScript.submit2Annotation(tools,sample,filtered,programDirectory,account);
-                    ongoing[tools].update(outgoing)
-                                    
+                    try:
+                        outgoing=annotationScript.submit2Annotation(tools,sample,filtered,programDirectory,account);
+                        ongoing[tools].update(outgoing)
+                    except:
+                        print("FAILED:was the sample excluded?");         
 
         common.UpdateProcessFiles(analysed,ongoing,processed,"annotation")  
         finished=1;

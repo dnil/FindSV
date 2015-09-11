@@ -70,7 +70,7 @@ def initiateProcessFile(available_tools,processed):
         else:
             for file in Files:
                 pathToProcessFile=os.path.join(pathToVariantFiles,file);
-                if not (os.path.exists(pathToProcessFile))
+                if not (os.path.exists(pathToProcessFile)):
                     open(pathToProcessFile, 'a').close()
 
         for file in processFiles[tool]:

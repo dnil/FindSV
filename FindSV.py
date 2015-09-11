@@ -1,13 +1,14 @@
-import sys, os, glob, argparse
+import sys, os, glob, argparse, shutil
 sys.path.append("modules")
 import readConfigFile, calling, filter, annotation,database
 
 #this module restart a selected process of a selected pipeline
 def restart(args):
-
+    programDirectory=os.path.dirname(os.path.abspath(__file__));
+    working_dir,path_to_bam,available_tools,account,exclude,processed=readConfigFile.readConfigFile(programDirectory)
     processes={"vc":["annotation","filter","database","calling"],"db":["annotation","filter","database"],"filter":["annotation","filter"],"annotation":["annotation"]}
 
-    print("restarting");
+    print("restarting:");
     projects={};
     with open(os.path.join(programDirectory,"project.txt")) as ongoing_fd:
         for line in ongoing_fd:
@@ -21,51 +22,70 @@ def restart(args):
         tmpProject[projectToProcess]=projects[projectToProcess];
         projects=tmpProject;  
 
-    toBeRestarted=[];
+    callerToBeRestarted=[];
     if args.caller == "all":
         print("all callers are being restarted!")    
-    
-	#read the config file
-    working_dir,path_to_bam,available_tools,account,exclude,processed=readConfigFile.readConfigFile(programDirectory)
+        for tools in available_tools:
+            callerToBeRestarted.append(tools);
+    else:
+        if args.caller in available_tools:
+            callerToBeRestarted.append(args.caller)
+        else:
+            print("Error, the caller is not available");
+            return(0);
+
+    processToBeRestarted=[];
+    if(args.vc):
+        processToBeRestarted=processes["vc"]
+    elif(args.db):
+        processToBeRestarted=processes["db"]
+    elif(args.filter):
+        processToBeRestarted=processes["filter"]
+    elif(args.annotation):
+        processToBeRestarted=processes["annotation"]
+
     for project in projects:  
-        
-        if(args.vc):
-            print("restarting project:" + project);
-        elif(args.db):
-            print("restarting project:" + project);
-        elif(args.filter):
-            print("restarting project:" + project);
-        elif(args.annotation):
-            print("restarting project:" + project);
-    
-
-
+        print(project);
+        for tools in callerToBeRestarted:
+            for process in processToBeRestarted:
+                print(process)
+                deletedProcess=os.path.join(processed,project,tools,process);
+                if(os.path.exists(deletedProcess)):
+                    shutil.rmtree(deletedProcess)
 
 def initiateProcessFile(available_tools,processed):
-	
-    analysed={}
-    ongoing={};
-    #read through the analysed and ongoing samples, or create files if such files are not existing
-    for tools in available_tools:
-        analysed[tools]={};
-        ongoing[tools]={};
-        pathToVariantFiles=os.path.join(processed,tools,"calling");
+    processFiles={};
+    Files=["ongoing","analysed","failed","timeout","cancelled","excluded"]
+    for tool in available_tools:
+        processFiles.update({ tool:{} })
+        for file in Files:
+            processFiles[tool].update({file:{}})
+
+        #read through the analysed and ongoing samples, or create files if such files are not existing
+        pathToVariantFiles=os.path.join(processed,tool,"calling");    
         if not (os.path.exists(pathToVariantFiles)):
             os.makedirs(os.path.join(pathToVariantFiles))
-            open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
-            open(os.path.join(pathToVariantFiles,"analysed"), 'a').close()
-        else:
-            with open(os.path.join(pathToVariantFiles,"analysed")) as analysed_fd:
-                for sample in analysed_fd:
-                    sample , pid ,project, outpath = sample.rstrip().split()
-                    analysed[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
-            with open(os.path.join(pathToVariantFiles,"ongoing")) as ongoing_fd:
-                for sample in ongoing_fd:
-                    if(sample[0] != "\n"):
-                        sample , pid ,project, outpath = sample.rstrip().split()
-                        ongoing[tools][sample] = {"pid":pid,"project":project,"outpath":outpath}
+            for file in Files:
+                open(os.path.join(pathToVariantFiles,file), 'a').close()
 
-    return(analysed,ongoing);
+        else:
+            for file in processFiles[tool]:
+                with open(os.path.join(pathToVariantFiles, file)) as analysed_fd:
+                    for sample in analysed_fd:
+
+                        row = sample.rstrip().split()
+                        sample=row[0];
+                        pid=row[1]
+                        project=row[2]
+                        outpath=row[3]
+                        if len(row) == 4:
+                            processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                        else:
+                            outputFile=row[4]
+                            processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
+
+
+    return(processFiles);
 
 
 def main(args):
@@ -97,21 +117,21 @@ def main(args):
         if not (os.path.exists(processFilesPath)):
             os.makedirs(processFilesPath)
 
-        #initate the analysed and ongoing dictionaries
-        analysed,ongoing=initiateProcessFile(available_tools,processFilesPath);
+        #initate the processFiles
+        processFiles=initiateProcessFile(available_tools,processFilesPath);
 
         #function used to find variants
-        analysed,ongoing=calling.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,analysed,ongoing,processFilesPath);
+        processFiles=calling.variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,processFiles,processFilesPath);
 
         #a function used to build databases from vcf files
-        analysed=database.buildDatabase(programDirectory,analysed,processFilesPath,account);
+        processFiles=database.buildDatabase(programDirectory,processFiles,processFilesPath,account);
         
 
         #function that filters the variant files and finds genomic features of the variants
-        analysed=filter.applyFilter(programDirectory,analysed,processFilesPath,account);
+        processFiles=filter.applyFilter(programDirectory,processFiles,processFilesPath,account);
 
         #function used to annotate the samples
-        analysed=annotation.annotation(programDirectory,analysed,processFilesPath,account);
+        processFiles=annotation.annotation(programDirectory,processFiles,processFilesPath,account);
 
     return
 

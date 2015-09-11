@@ -14,8 +14,8 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     VCFdictionary={};    
     for sample in analysedProject:
         VCFdictionary[sample]=[];
-        path=analysed[analysisTool][sample]["outpath"];
-        project=analysed[analysisTool][sample]["project"];
+        path=analysed[analysisTool]["analysed"][sample]["outpath"];
+        project=analysed[analysisTool]["analysed"][sample]["project"];
         # _ needs to be split from the FindTranslocation vcf name, thus the number of _ present in teh sample must be known
         N=sample.count('_')
 
@@ -76,7 +76,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                     sbatch.write("\n")
                     FileName[i]="{0};.Feature.vcf".format(vcf[1])
                 i=i+1
-            analysed[analysisTool][sample]["outputFile"]="\t".join(FileName);
+            analysed[analysisTool]["analysed"][sample]["outputFile"]="\t".join(FileName);
         sbatch.write("\n")
         sbatch.write("\n")
 
@@ -84,7 +84,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     add2Ongoing={};
     pid = int(common.generateSlurmJob(sbatch_dir,project))
     for sample in analysedProject:
-        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool][sample]["outpath"],"project":analysed[analysisTool][sample]["project"],"outputFile":analysed[analysisTool][sample]["outputFile"]}});
+        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":analysed[analysisTool]["analysed"][sample]["outputFile"]}});
     
     return (add2Ongoing);
 

@@ -5,7 +5,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
 
-    samplePath=os.path.join(analysed[tools][sample]["outpath"],tools)
+    samplePath=os.path.join(analysed[tools]["analysed"][sample]["outpath"],tools)
     path2snpEFF = os.path.join(programDirectory,"programFiles","snpEff","snpEff.jar");
     path2snpEFFconfig=os.path.join(programDirectory,"programFiles","snpEff","snpEff.config")
     reference="GRCh37.75";
@@ -27,7 +27,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
         sbatch.write("\n");
         sbatch.write("\n");
 
-        files=analysed[tools][sample]["outputFile"]
+        files=analysed[tools]["analysed"][sample]["outputFile"]
         files=files.strip().split("\t")
         path2Input=os.path.join(samplePath,"filtered")
         FileName=[];
@@ -45,6 +45,6 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
         sbatch.write("\n")
 
 
-    analysed[tools][sample]["outputFile"]="\t".join(FileName)
-    analysed[tools][sample]["pid"]=int(common.generateSlurmJob(sbatch_dir,sample))
-    return ( {sample:analysed[tools][sample]} );
+    analysed[tools]["analysed"][sample]["outputFile"]="\t".join(FileName)
+    analysed[tools]["analysed"][sample]["pid"]=int(common.generateSlurmJob(sbatch_dir,sample))
+    return ( {sample:analysed[tools]["analysed"][sample]} );

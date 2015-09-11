@@ -4,34 +4,32 @@ import common
 import annotationScript
 
 #function used to annotate the filtered variants
-def annotation(programDirectory,filtered,processed,account):
+def annotation(programDirectory,previousProcessFiles,processed,account):
        
         #read the process files
-        analysed,ongoing=common.readProcessFiles(filtered,processed,"annotation")
-        for tools in filtered: 
+        processFiles=common.readProcessFiles(previousProcessFiles,processed,"annotation")
+        for tools in previousProcessFiles: 
              print("annotation: "+tools);
-             for sample in filtered[tools]:
-                if sample in ongoing[tools]:
-                    #check the status of the ongoing sample;
-                    done=common.get_slurm_job_status(int(ongoing[tools][sample]["pid"])) 
-                    if done == 0:
-                        analysed[tools][sample] = ongoing[tools][sample];
-                        del ongoing[tools][sample]                                        
-                        print "sample {0} DONE".format(sample)
-                    else:
-                        print "sample {0} ONGOING".format(sample)
-
-                    print("ongoing: " + sample);
-                elif sample in analysed[tools]:
-                    print("analysed: " + sample);
+             for sample in previousProcessFiles[tools]["analysed"]:
+                if sample in processFiles[tools]["ongoing"]:
+                    done=common.get_slurm_job_status(int(processFiles[tools]["ongoing"][sample]["pid"]))
+                    processFiles=common.get_process_status(done,processFiles,tools,sample)
+                elif sample in processFiles[tools]["failed"].keys():
+                    print "sample {0} FAILED".format(sample)
+                elif sample in processFiles[tools]["cancelled"].keys():
+                    print "sample {0} CANCELLED".format(sample)
+                elif sample in processFiles[tools]["timeout"].keys():
+                    print "sample {0} TIMEOUT".format(sample)
+                elif sample in processFiles[tools]["excluded"].keys():
+                    print "sample {0} EXCLUDED".format(sample)
                 else:
                     print("submitting: " + sample);
                     try:
-                        outgoing=annotationScript.submit2Annotation(tools,sample,filtered,programDirectory,account);
-                        ongoing[tools].update(outgoing)
+                        outgoing=annotationScript.submit2Annotation(tools,sample,previousProcessFiles,programDirectory,account);
+                        processFiles[tools]["ongoing"].update(outgoing)
                     except:
                         print("FAILED:was the sample excluded?");         
 
-        common.UpdateProcessFiles(analysed,ongoing,processed,"annotation")  
+        common.UpdateProcessFiles(processFiles,processed,"annotation")  
         finished=1;
-        return(analysed);
+        return(processFiles);

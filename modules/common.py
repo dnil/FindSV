@@ -31,75 +31,53 @@ def readProcessFiles(analysed,processed,step):
     finished={}
     ongoing={};
     #look for the files used to keep track of the processing, if the files exists, read them. If not, create empty files
+    processFiles={}
+    Files=["ongoing","analysed","failed","timeout","cancelled","excluded"]
     for tool in analysed:
-        finished[tool]={}
-        ongoing[tool]={}
+        processFiles.update({ tool:{} })
+        for file in Files:
+            processFiles[tool].update({file:{}})
         pathToVariantFiles=os.path.join(processed,tool,step);
-
+        
         if not (os.path.exists(pathToVariantFiles)):
             os.makedirs(os.path.join(pathToVariantFiles))
-            open(os.path.join(pathToVariantFiles,"ongoing"), 'a').close()
-            open(os.path.join(pathToVariantFiles,"analysed"), 'a').close()
-
+            for file in Files:
+                open(os.path.join(pathToVariantFiles,file), 'a').close()
         else:
-            with open(os.path.join(pathToVariantFiles, "analysed")) as analysed_fd:
-                for sample in analysed_fd:
+            for file in processFiles[tool]:
+                with open(os.path.join(pathToVariantFiles, file)) as analysed_fd:
+                    for sample in analysed_fd:
 
-                    row = sample.rstrip().split()
-                    sample=row[0];
-                    pid=row[1]
-                    project=row[2]
-                    outpath=row[3]
-                    if len(row) == 4:
-                        finished[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
-                    else:
-                        outputFile=row[4]
-                        finished[tool][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
-            with open(os.path.join(pathToVariantFiles, "ongoing")) as ongoing_fd:
-                for sample in ongoing_fd:
-                    if(sample[0] != "\n"):
                         row = sample.rstrip().split()
                         sample=row[0];
                         pid=row[1]
                         project=row[2]
                         outpath=row[3]
                         if len(row) == 4:
-	                        ongoing[tool][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                            processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath}
                         else:
                             outputFile=row[4]
-                            ongoing[tool][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
+                            processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
 
-    return(finished,ongoing)
+    return(processFiles)
 
 #update the ongoing and analysesd files
-def UpdateProcessFiles(analysed,ongoing,processed,step):
+def UpdateProcessFiles(processFiles,processed,step):
 
     #update the process files and return the finished dictionary
-    for tools in analysed:
-        pathToVariantFiles=os.path.join(processed,tools,step);
-        with open(os.path.join(pathToVariantFiles, "analysed"), 'w') as analysed_fd:
-            for sample, dictionary in analysed[tools].items():
-                    pid=dictionary["pid"]
-                    projectName=dictionary["project"]
-                    outPath=dictionary["outpath"]
-                    if not "outputFile" in dictionary: 
-                        analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
-                    else:
-                        outputFile=dictionary["outputFile"]
-                        analysed_fd.write("{0} {1} {2} {3} {4}\n".format(sample,pid ,projectName,outPath,outputFile))
-
-    for tools in ongoing:
-        pathToVariantFiles=os.path.join(processed,tools,step);
-        with open(os.path.join(pathToVariantFiles, "ongoing"), 'w') as ongoing_fd:
-            for sample, dictionary in ongoing[tools].items():
-                pid=dictionary["pid"]
-                projectName=dictionary["project"]
-                outPath=dictionary["outpath"]
-                if not "outputFile" in dictionary:
-                    ongoing_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
-                else:
-                    outputFile=dictionary["outputFile"]
-                    ongoing_fd.write("{0} {1} {2} {3} {4}\n".format(sample,pid ,projectName,outPath,outputFile))
+    for tools in processFiles:
+        for file in processFiles[tools]:
+            pathToVariantFiles=os.path.join(processed,tools,step);
+            with open(os.path.join(pathToVariantFiles, file), 'w') as analysed_fd:
+                for sample, dictionary in processFiles[tools][file].items():
+                        pid=dictionary["pid"]
+                        projectName=dictionary["project"]
+                        outPath=dictionary["outpath"]
+                        if not "outputFile" in dictionary: 
+                            analysed_fd.write("{0} {1} {2} {3}\n".format(sample,pid ,projectName,outPath))
+                        else:
+                            outputFile=dictionary["outputFile"]
+                            analysed_fd.write("{0} {1} {2} {3} {4}\n".format(sample,pid ,projectName,outPath,outputFile))
 
 #get the status of the slurm jobs
 def get_slurm_job_status(slurm_job_id):
@@ -116,10 +94,10 @@ def get_slurm_job_status(slurm_job_id):
                         "RUNNING": 1,
                         "RESIZING": 1,
                         "SUSPENDED": 1,
-                        "COMPLETED": 0,
-                        "CANCELLED": 0,
+                        "COMPLETED": 2,
+                        "CANCELLED": 3,
                         "FAILED": 0,
-                        "TIMEOUT": 0,
+                        "TIMEOUT": 4,
                         "PREEMPTED": 0,
                         "BOOT_FAIL": 0,
                         "NODE_FAIL": 0,
@@ -149,4 +127,32 @@ def get_slurm_job_status(slurm_job_id):
         except (IndexError, KeyError, TypeError) as e:
             print("SLURM job status not understood: {0}".format(job_status))
 
+#this process checks the status of an ongoing job and updates its status in the processFile dictionary
+def get_process_status(done,processFile,tools,sample_name):
+
+    if done == 1: 
+        print "sample {0} ONGOING".format(sample_name)
+
+    elif done == 2:
+        processFile[tools]["analysed"][sample_name] = processFile[tools]["ongoing"][sample_name]
+        del processFile[tools]["ongoing"][sample_name]                    
+        print "sample {0} DONE".format(sample_name)
+
+    elif done == 3:
+        processFile[tools]["cancelled"][sample_name] = processFile[tools]["ongoing"][sample_name]
+        del processFile[tools]["ongoing"][sample_name]      
+        print "sample {0} CANCELLED".format(sample_name)
+
+    elif done == 4:
+        processFile[tools]["timeout"][sample_name] = processFile[tools]["ongoing"][sample_name]
+        del processFile[tools]["ongoing"][sample_name]      
+        print "sample {0} OUTOFTIME".format(sample_name)
+
+    else:
+        processFile[tools]["failed"][sample_name] = processFile[tools]["ongoing"][sample_name]
+        del processFile[tools]["ongoing"][sample_name]      
+        print "sample {0} FAILED".format(sample_name)
+
+    return(processFile);
+    
 

@@ -30,7 +30,7 @@ def submit2DB(newsamples,tools,sample,programDirectory,processed,account):
         sbatch.write("\n");
         sbatch.write("\n");
         DBpath=os.path.join(samplePath,"database",sample+".db")
-        sbatch.write("python {0} --variations {1} --tollerance 0 > {2}\n".format(path2Build,fileString,DBpath) );
+        sbatch.write("python {0} --variations {1} --tollerance 0 --fixed > {2}\n".format(path2Build,fileString,DBpath) );
 
         sbatch.write("\n")
         sbatch.write("\n")

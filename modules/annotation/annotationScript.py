@@ -7,7 +7,6 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
 
     samplePath=os.path.join(analysed[tools]["analysed"][sample]["outpath"],tools)
     path2snpEFF = os.path.join(programDirectory,"programFiles","snpEff","snpEff.jar");
-    path2snpEFFconfig=os.path.join(programDirectory,"programFiles","snpEff","snpEff.config")
     reference="GRCh37.75";
     
 
@@ -39,8 +38,9 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
             infile=prefix+sufix;
 
             FileName.append(";".join([prefix,outsufix]))
-            sbatch.write("java -Xmx4g -jar {0} -c {1} {2} {3} > {4}\n".format(path2snpEFF,path2snpEFFconfig,reference,os.path.join(path2Input,infile),os.path.join(outpath,outfile)) );
-        
+            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 100 --port 3337 --vcf --whole_genome\n"
+            .format( path2snpEFF , os.path.join(path2Input,infile) , os.path.join(outpath,outfile )))
+
         sbatch.write("\n")
         sbatch.write("\n")
 

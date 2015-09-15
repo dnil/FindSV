@@ -1,2 +1,0 @@
-available_tools=snpEFF
-reference=GRCh37.75

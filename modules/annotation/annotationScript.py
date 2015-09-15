@@ -6,9 +6,8 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
     import common
 
     samplePath=os.path.join(analysed[tools]["analysed"][sample]["outpath"],tools)
-    path2snpEFF = os.path.join(programDirectory,"programFiles","snpEff","snpEff.jar");
+    path2snpEFF = os.path.join(programDirectory,"programFiles","ensembl-tools-release-81","scripts","variant_effect_predictor","variant_effect_predictor.pl");
     reference="GRCh37.75";
-    
 
     outpath=os.path.join(samplePath,"annotation");
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);

@@ -6,6 +6,7 @@ import readConfigFile, calling, filter, annotation,database
 def restart(args):
     programDirectory=os.path.dirname(os.path.abspath(__file__));
     working_dir,path_to_bam,available_tools,account,exclude,processed=readConfigFile.readConfigFile(programDirectory)
+    statusFiles=["timeout","failed","cancelled"]
     processes={"vc":["annotation","filter","database","calling"],"db":["annotation","filter","database"],"filter":["annotation","filter"],"annotation":["annotation"]}
 
     print("restarting:");
@@ -16,12 +17,26 @@ def restart(args):
                 info=line.split("\t");
                 projects[info[0].rstrip()]=info[1].rstrip();     
 
+    #check if any project i selected
     if args.project:
         projectToProcess = args.project;
         tmpProject={};
         tmpProject[projectToProcess]=projects[projectToProcess];
         projects=tmpProject;  
 
+    #check if any status file is selected
+    restartStatusFiles=[];
+    if args.status:
+        if args.status == "all":
+            restartStatusFiles=statusFiles;
+        elif args.status in statusFiles:
+            restartStatusFiles=[args.status]
+        else:
+            print("invalid status file");
+            return(0);
+
+
+    #check which caller is selected
     callerToBeRestarted=[];
     if args.caller == "all":
         print("all callers are being restarted!")    
@@ -34,6 +49,7 @@ def restart(args):
             print("Error, the caller is not available");
             return(0);
 
+    #check which steps will be restarted
     processToBeRestarted=[];
     if(args.vc):
         processToBeRestarted=processes["vc"]
@@ -44,17 +60,26 @@ def restart(args):
     elif(args.annotation):
         processToBeRestarted=processes["annotation"]
 
+    #itterate through each project
     for project in projects:  
         print(project);
         for tools in callerToBeRestarted:
             for process in processToBeRestarted:
                 print(process)
                 deletedProcess=os.path.join(processed,project,tools,process);
-                if(os.path.exists(deletedProcess)):
+                #if the entire step is to be restarted, delete the folder conaining the status files
+                if(os.path.exists(deletedProcess) and not restartStatusFiles  ):
                     shutil.rmtree(deletedProcess)
+                #if a certain statusfile is specified, restart only that file
+                elif(restartStatusFiles):
+                    for files in restartStatusFiles:
+                        deletedStatusFile=os.path.join(deletedProcess,files)
+                        if(os.path.exists(deletedStatusFile)):
+                            os.remove(deletedStatusFile);
 
 def initiateProcessFile(available_tools,processed):
     processFiles={};
+
     Files=["ongoing","analysed","failed","timeout","cancelled","excluded"]
     for tool in available_tools:
         processFiles.update({ tool:{} })
@@ -172,6 +197,7 @@ if __name__ == '__main__':
         parser.add_argument('--db',action="store_true",required=False,help="restart the database creation step of the selected caller")
         parser.add_argument('--filter',action="store_true",required=False,help="restart the database query step of the selected caller")
         parser.add_argument('--annotation',action="store_true",required=False,help="restart teh annotation step of the selected caller")
+        parser.add_argument('--status',type = str, default=None,help="Restart one of the status files(failed,timeout,cancelled,all)")
         args = parser.parse_args()
         restart(args);
     elif(args.manage):

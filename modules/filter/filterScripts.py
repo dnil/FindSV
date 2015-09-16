@@ -47,20 +47,21 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     
     path2Query = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","query_db.py")
     path2Features = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","screen_results.py")
-    with open(os.path.join(sbatch_dir, "{0}.slurm".format(project)), 'w') as sbatch:
+    add2Ongoing={};
+    for sample in analysedProject:
+        with open(os.path.join(sbatch_dir, "{0}.slurm".format(sample)), 'w') as sbatch:
 		
-        sbatch.write("#! /bin/bash -l\n")
-        sbatch.write("#SBATCH -A {}\n".format(account))
-        sbatch.write("#SBATCH -o {0}/filter_{1}.out\n".format(out_dir,project))
-        sbatch.write("#SBATCH -e {0}/filter_{1}.err\n".format(err_dir,project))
-        sbatch.write("#SBATCH -J filter_{0}_{1}.job\n".format(project,analysisTool))
-        sbatch.write("#SBATCH -p core\n")
-        sbatch.write("#SBATCH -t 2-00:00:00\n")
-        sbatch.write("#SBATCH -n 1 \n")
-        sbatch.write("\n")
-        sbatch.write("\n")
-        #iterate through every analysed sample, query every vcf of the sample against every db
-        for sample in analysedProject:
+            sbatch.write("#! /bin/bash -l\n")
+            sbatch.write("#SBATCH -A {}\n".format(account))
+            sbatch.write("#SBATCH -o {0}/filter_{1}.out\n".format(out_dir,sample))
+            sbatch.write("#SBATCH -e {0}/filter_{1}.err\n".format(err_dir,sample))
+            sbatch.write("#SBATCH -J filter_{0}_{1}.job\n".format(sample,analysisTool))
+            sbatch.write("#SBATCH -p core\n")
+            sbatch.write("#SBATCH -t 10:00:00\n")
+            sbatch.write("#SBATCH -n 1 \n")
+            sbatch.write("\n")
+            sbatch.write("\n")
+            #iterate through every analysed sample, query every vcf of the sample against every db
             FileName=[]
             i=0;
             for vcf in VCFdictionary[sample]:
@@ -77,14 +78,12 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                     FileName[i]="{0};.Feature.vcf".format(vcf[1])
                 i=i+1
             analysed[analysisTool]["analysed"][sample]["outputFile"]="\t".join(FileName);
-        sbatch.write("\n")
-        sbatch.write("\n")
-
-
-    add2Ongoing={};
-    pid = int(common.generateSlurmJob(sbatch_dir,project))
-    for sample in analysedProject:
-        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":analysed[analysisTool]["analysed"][sample]["outputFile"]}});
+            sbatch.write("\n")
+            sbatch.write("\n")
+        
+            pid = int(common.generateSlurmJob(sbatch_dir,sample))
+    
+            add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":analysed[analysisTool]["analysed"][sample]["outputFile"]}});
     
     return (add2Ongoing);
 

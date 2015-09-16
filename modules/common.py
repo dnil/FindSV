@@ -44,20 +44,25 @@ def readProcessFiles(analysed,processed,step):
             for file in Files:
                 open(os.path.join(pathToVariantFiles,file), 'a').close()
         else:
-            for file in processFiles[tool]:
-                with open(os.path.join(pathToVariantFiles, file)) as analysed_fd:
-                    for sample in analysed_fd:
+            for file in Files:
+                pathToProcessFile=os.path.join(pathToVariantFiles,file);
+                if not (os.path.exists(pathToProcessFile)):
+                    open(pathToProcessFile, 'a').close()
 
-                        row = sample.rstrip().split()
-                        sample=row[0];
-                        pid=row[1]
-                        project=row[2]
-                        outpath=row[3]
-                        if len(row) == 4:
-                            processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath}
-                        else:
-                            outputFile=row[4]
-                            processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
+        for file in processFiles[tool]:
+            with open(os.path.join(pathToVariantFiles, file)) as analysed_fd:
+                for sample in analysed_fd:
+
+                    row = sample.rstrip().split()
+                    sample=row[0];
+                    pid=row[1]
+                    project=row[2]
+                    outpath=row[3]
+                    if len(row) == 4:
+                        processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath}
+                    else:
+                        outputFile=row[4]
+                        processFiles[tool][file][sample] = {"pid":pid,"project":project,"outpath":outpath,"outputFile":outputFile}
 
     return(processFiles)
 

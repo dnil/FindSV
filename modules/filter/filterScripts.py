@@ -49,6 +49,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     path2Features = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","screen_results.py")
     add2Ongoing={};
     for sample in analysedProject:
+        analysed[analysisTool]["analysed"][sample]["outputFile"]="";
         with open(os.path.join(sbatch_dir, "{0}.slurm".format(sample)), 'w') as sbatch:
 		
             sbatch.write("#! /bin/bash -l\n")
@@ -77,7 +78,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                     sbatch.write("\n")
                     FileName[i]="{0}.Feature.vcf".format(vcf[1])
                 i=i+1
-                analysed[analysisTool]["analysed"][sample]["outputFile"]=";".join(FileName);
+                analysed[analysisTool]["analysed"][sample]["outputFile"]= ";".join(FileName);
             sbatch.write("\n")
             sbatch.write("\n")
         

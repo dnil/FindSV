@@ -82,9 +82,8 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             sbatch.write("\n")
             sbatch.write("\n")
         
-            pid = int(common.generateSlurmJob(sbatch_dir,sample))
-    
-            add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":analysed[analysisTool]["analysed"][sample]["outputFile"]}});
+        pid = int(common.generateSlurmJob(sbatch_dir,sample))
+        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":analysed[analysisTool]["analysed"][sample]["outputFile"]}});
     
     return (add2Ongoing);
 

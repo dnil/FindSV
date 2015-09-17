@@ -19,7 +19,7 @@ def applyFilter(programDirectory,previousProcessFiles,processed,account):
         database=previousProcessFiles[tool]["analysed"].keys();
         #only run the query when the previous query was finished and when there are newly generated databases
         #WARNING, if the user removes samples from the database log file, the condition will always be true,TODO: change to set comparison
-        if(processFiles[tool]["ongoing"] == {} and filtered.sort() != database.sort() ):
+        if(processFiles[tool]["ongoing"] == {} and sorted(filtered) != sorted(database) ):
             add2Ongoing=filterScripts.runScripts(tool,previousProcessFiles[tool]["analysed"].keys(),previousProcessFiles,programDirectory,account);
             processFiles[tool]["ongoing"].update(add2Ongoing);
                                                         

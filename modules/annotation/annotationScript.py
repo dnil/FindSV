@@ -33,7 +33,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
             infile=file;
             outsufix=".annotated.vcf"
             prefix=file.rsplit(".",1)[0]
-            outfile+=prefix+outsufix;
+            outfile=prefix+outsufix;
 
             FileName.append(outfile)
             sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 100 --port 3337 --vcf --whole_genome  --format vcf -q\n"

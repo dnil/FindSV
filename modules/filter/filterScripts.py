@@ -78,7 +78,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                     sbatch.write("\n")
                     FileName[i]="{0}.Feature.vcf".format(vcf[1])
                 i=i+1
-                analysed[analysisTool]["analysed"][sample]["outputFile"]= ";".join(FileName);
+            analysed[analysisTool]["analysed"][sample]["outputFile"]= ";".join(FileName);
             sbatch.write("\n")
             sbatch.write("\n")
         

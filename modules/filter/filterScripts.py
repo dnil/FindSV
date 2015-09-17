@@ -68,16 +68,16 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                 FileName.append("");
                 filePath=os.path.join(outpath,"{0}.Query.vcf".format(vcf[1]))
                 sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , os.path.join(pathToTool,"database") ,filePath) );
-                FileName[i]="{0};.Query.vcf".format(vcf[1])
+                FileName[i]="{0}.Query.vcf".format(vcf[1])
                 #add features
                 sbatch.write("\n")
                 if featureList != "":
                     feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(vcf[1]));
                     sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
                     sbatch.write("\n")
-                    FileName[i]="{0};.Feature.vcf".format(vcf[1])
+                    FileName[i]="{0}.Feature.vcf".format(vcf[1])
                 i=i+1
-            analysed[analysisTool]["analysed"][sample]["outputFile"]="\t".join(FileName);
+                analysed[analysisTool]["analysed"][sample]["outputFile"]=";".join(FileName);
             sbatch.write("\n")
             sbatch.write("\n")
         

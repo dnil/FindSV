@@ -26,15 +26,14 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
         sbatch.write("\n");
 
         files=analysed[tools]["analysed"][sample]["outputFile"]
-        files=files.strip().split("\t")
+        files=files.strip().split(";")
         path2Input=os.path.join(samplePath,"filtered")
         FileName=[];
         for file in files:
-            prefix,sufix=file.split(";");
+            infile=file;
             outsufix=".annotated.vcf"
-
+            prefix=file.rsplit(".",1)[0]
             outfile=prefix+outsufix;
-            infile=prefix+sufix;
 
             FileName.append(";".join([prefix,outsufix]))
             sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 100 --port 3337 --vcf --whole_genome  --format vcf -q\n"

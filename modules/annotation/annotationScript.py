@@ -36,7 +36,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
             outfile=prefix+outsufix;
 
             FileName.append(outfile)
-            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 100 --port 3337 --vcf --whole_genome  --format vcf -q\n"
+            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 5 --port 3337 --vcf --whole_genome  --format vcf -q\n"
             .format( path2snpEFF , os.path.join(path2Input,infile) , os.path.join(outpath,outfile )))
 
         sbatch.write("\n")

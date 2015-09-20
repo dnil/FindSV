@@ -22,6 +22,8 @@ def annotation(programDirectory,previousProcessFiles,processed,account):
                     print "sample {0} TIMEOUT".format(sample)
                 elif sample in processFiles[tools]["excluded"].keys():
                     print "sample {0} EXCLUDED".format(sample)
+                elif sample in processFiles[tools]["analysed"].keys():
+                    print "sample {0} COMPLETE".format(sample)
                 else:
                     print("submitting: " + sample);
                     try:

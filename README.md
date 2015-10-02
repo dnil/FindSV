@@ -154,9 +154,9 @@ The reference file contains paths leading to the references used by fermikit and
 - bwa-indexed-ref=/proj/b2014152/nobackup/jesperei/references/concat.fa
 
 chromosomes is used by cnvnator and should contain a refererence file for each chromosome, files should be named in the following manner:
--chr1
--chr2
--chrN
+- chr1.fa
+- chr2.fa
+- chrN.fa
 
 bwa-indexed-ref is used by fermikit, it should contain the path to a bwa inexed reference file
 

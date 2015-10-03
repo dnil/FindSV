@@ -10,35 +10,11 @@ FindSV accepts the path to a folder containing multiple project folders. Each pr
 
 Install
 =======
-Download the pipeline using the following command:
+Download and build the pipeline using the following commands:
 ```
 git clone https://github.com/J35P312/FindSV.git
-```
-
-enter the FindSV/programFiles folder and run the downloadFindTranslocations script:
-
-```
 cd FindSV/programFiles
-chmod +x downloadFindTranslocations
-./downloadFindTranslocations
-```
-
-enter the FindTranslocations folder and compile:
-
-```
-cd FindTranslocations
-mkdir build
-cd build
-cmake .. -DBoost_NO_BOOST_CMAKE=ON
-make
-```
-
-Then make FindTranslocations executable:
-
-```
-cd ../bin
-
-chmod +x FindTranslocations
+bash InstallScript
 ```
 
 Running
@@ -48,7 +24,6 @@ First load python 2.7:
 ```
 module load python/2.7
 ```
-
 
 The first time a project is run, it neds to be added to the project.txt file. 
 This is a tab separated text file containing the path to the folder were the project folders are located, and the name of the project folder.

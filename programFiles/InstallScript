@@ -1,5 +1,15 @@
 git clone https://github.com/SciLifeLab/FindTranslocations.git
 
+cd FindTranslocations
+mkdir build
+cd build
+cmake .. -DBoost_NO_BOOST_CMAKE=ON
+make
+
+cd ../bin
+chmod a+x FindTranslocations
+cd ../..
+
 #wget http://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip
 #unzip snpEff_latest_core.zip
 #rm snpEff_latest_core.zip

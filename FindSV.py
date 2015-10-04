@@ -1,6 +1,7 @@
 import sys, os, glob, argparse, shutil
 sys.path.append("modules")
 import readConfigFile, calling, filter, annotation, database
+import time
 
 #this module restart a selected process of a selected pipeline
 def restart(args):
@@ -249,8 +250,20 @@ if __name__ == '__main__':
                             help="run the pipeline")
         parser.add_argument('--project', type=str, required=False, default=None,
                             help="restrict analysis to the specified project\n")
+        parser.add_argument('--cycle', type=float , default = None, 
+                            help="rerun the pipeline automatically once every nth hour")
         args = parser.parse_args()
-        main(args)
+
+        while True:
+            main(args)
+            if(args.cycle):
+                timeToSleep=round(args.cycle*3600)
+                print("next itteration in " + str(timeToSleep) + " seconds")
+                time.sleep(timeToSleep)
+            else:
+                break
+
+
     elif(args.help):
         parser.print_help()
     else:

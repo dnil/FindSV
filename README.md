@@ -44,15 +44,19 @@ If these lines are present in the project.txt file, all samples located in the f
 The pipeline is started using the following command:
 
 ```
-python FindSV
+python FindSV --run
 ```
 
+or run it every nth hour using this command
+```
+python FindSV --run --cycle n
+```
 
 to analyse only one of the projects, run the pipeline using the following arguments:
 
 
 ```
-python FindSV --project runthisproject
+python FindSV --run --project runthisproject
 ```
 
 where runthisfolder is the project you wish to run.
@@ -62,7 +66,7 @@ The available tools of the pipeline may be listed using the ```--list``` option:
 python FindSV --list
 ```
 
-At the moment the available tools are:
+At the moment the available variant callers are:
 - Fermikit
 - FindTranslocations
 - CNVnator

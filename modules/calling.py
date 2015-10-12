@@ -42,9 +42,8 @@ def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_t
                             # sample state is NEW
                             # submit this sample, if submission works fine store it in under analysis with the PID 
                             call="scripts." + tools+"(\""+programDirectory+"\",\""+local_project_dir+"/"+tools+"\",\""+sample_name+"\",\""+os.path.join(path_to_sample, file)+"\",\""+account+"\")"
-                            print(call);
-                            pid = eval(call)
-                            processFiles[tools]["ongoing"][sample_name] = {"pid":pid,"project":project_name,"outpath": local_project_dir}
+                            callerOutput = eval(call)
+                            processFiles[tools]["ongoing"][sample_name] = {"pid":callerOutput[0],"project":project_name,"outpath": local_project_dir,"outputFile":callerOutput[1]}
                             print "sample {0} LAUNCHED".format(sample_name)
 
         common.UpdateProcessFiles(processFiles,processed,"calling")

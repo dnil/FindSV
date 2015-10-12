@@ -2,9 +2,10 @@ import os
 import subprocess
 import re
 import sys
-#this module contains all the tools available to the pipeline, scripts may be added or removed as needed. Every tools should be stored in a separate function. the function arguments are the
-#local_dir, which is the output folder of the main script, the sample_name, which is the name of the sample, and the bam_file which is the path to the bam file
-#Each function must output the slurm_job ID
+#this module contains all the variant calling tools available to the pipeline, scripts may be added or removed as needed. Every tools should be stored in a separate function. the function arguments are the
+#programDirectory, which is the path to FindSV. local_dir, which is the output folder of the main script, the sample_name, which is the name of the sample, and the bam_file which is the path to the bam file
+# and lastly account, which is the slurm account
+#Each function must output a list containing the  slurm_job ID and the name of the output vcf
 #The concent of each function is a printer of an sbatch file, the sbatch file is printed to the output folder and started using slurm.
 
 #This function is used to search the reference file for the path of the references.
@@ -68,7 +69,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n")
         sbatch.write("\n")
 
-    return ( int(common.generateSlurmJob(sbatch_dir,sample_name)) );
+    return ([ int(common.generateSlurmJob(sbatch_dir,sample_name)), "{}.vcf".format(sample_name) ] );
 
 #the function used to run FindTranslocations
 def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account):
@@ -110,7 +111,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("\n")
         sbatch.write("\n")
 
-    return ( int(common.generateSlurmJob(sbatch_dir,sample_name)) );
+    return ( [int(common.generateSlurmJob(sbatch_dir,sample_name)),"{0}_inter_chr_events.vcf;{0}_intra_chr_events.vcf".format(sample_name)] );
 
 #the function used fermikit
 def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
@@ -156,4 +157,4 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n")
         sbatch.write("\n")
 
-    return ( int(common.generateSlurmJob(sbatch_dir,sample_name)) );
+    return ( [int(common.generateSlurmJob(sbatch_dir,sample_name)), "{}.sv.vcf".format(sample_name)] );

@@ -5,17 +5,17 @@ def submit2DB(newsamples,tools,sample,programDirectory,processed,account):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
 
-    fileExtensions={"fermiKit":[".sv.vcf"],"CNVnator":[".vcf"],"FindTranslocations":["_inter_chr_events.vcf","_intra_chr_events.vcf"]}
-
     samplePath=os.path.join(newsamples[tools][sample]["outpath"],tools)
     path2Build = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","build_db.py");
 
     outpath=os.path.join(samplePath,"database");
-    sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
 
+    sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
+    files=newsamples[tools][sample]["outputFile"]
+    files=files.strip().split(";")
     fileString=""
-    for file in fileExtensions[tools]:
-        fileString += " " + os.path.join(samplePath,sample+file)
+    for file in files:
+        fileString += " " + os.path.join(samplePath,file)
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
@@ -35,6 +35,6 @@ def submit2DB(newsamples,tools,sample,programDirectory,processed,account):
         sbatch.write("\n")
         sbatch.write("\n")
 
-    return ( int(common.generateSlurmJob(sbatch_dir,sample)) );
+    return ( [int(common.generateSlurmJob(sbatch_dir,sample)), sample+".db"] );
 
 

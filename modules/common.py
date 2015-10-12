@@ -21,10 +21,10 @@ def generateSlurmJob(sbatch_dir,sample_name):
     process = "sbatch {0}".format(os.path.join(sbatch_dir, "{0}.slurm").format(sample_name))
     p_handle = subprocess.Popen(process, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)    
     p_out, p_err = p_handle.communicate()
-    try:
-        return( re.match(r'Submitted batch job (\d+)', p_out).groups()[0] );
-    except AttributeError:
-        raise RuntimeError('Could not submit sbatch')
+    #try:
+    return( re.match(r'Submitted batch job (\d+)', p_out).groups()[0] );
+    #except AttributeError:
+     #   raise RuntimeError('Could not submit sbatch')
 
 #read the ongoing or analysis files or create empty files
 def readProcessFiles(analysed,processed,step):

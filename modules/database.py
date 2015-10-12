@@ -40,9 +40,10 @@ def buildDatabase(programDirectory,previousProcessFiles,processed,account):
         print(tools);
         for sample in newsamples[tools]:
             print("sample:" + sample);
-            pid=submitToDatabase.submit2DB(newsamples,tools,sample,programDirectory,processed,account)
+            databaseOutput=submitToDatabase.submit2DB(newsamples,tools,sample,programDirectory,processed,account)
             processFiles[tools]["ongoing"].update({sample:newsamples[tools][sample]})
-            processFiles[tools]["ongoing"][sample]["pid"]=pid
+            processFiles[tools]["ongoing"][sample]["pid"]=databaseOutput[0];
+            processFiles[tools]["ongoing"][sample]["outputFile"]=databaseOutput[1];
 
     common.UpdateProcessFiles(processFiles,processed,"database")
 

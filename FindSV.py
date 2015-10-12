@@ -1,6 +1,6 @@
 import sys, os, glob, argparse, shutil
 sys.path.append("modules")
-import readConfigFile, calling, filter, annotation, database
+import readConfigFile, calling, filter, annotation, database,combine
 import time
 
 #this module restart a selected process of a selected pipeline
@@ -9,7 +9,8 @@ def restart(args):
     (working_dir, path_to_bam, available_tools, account, exclude, 
         processed) = readConfigFile.readConfigFile(programDirectory)
     statusFiles = ["timeout", "failed", "cancelled"]
-    processes = {"vc":["annotation", "filter", "database", "calling"],
+    processes = {"caller":["annotation", "filter", "database","combine"],
+                 "combine":["annotation", "filter", "database","combine"],
                  "db":["annotation", "filter", "database"], 
                  "filter":["annotation", "filter"], 
                  "annotation":["annotation"]}
@@ -49,14 +50,21 @@ def restart(args):
     else:
         if args.caller in available_tools:
             callerToBeRestarted.append(args.caller)
-        else:
-            print("Error, the caller is not available.")
-            return(0)
+
+    #restart the callers by removing the status files
+    for project in projects:
+        for caller in callerToBeRestarted:
+            deletedProcess = os.path.join(processed, project, caller)
+            if(os.path.exists(deletedProcess)):
+                shutil.rmtree(deletedProcess)
+        
 
     # Check which steps will be restarted
     processToBeRestarted = []
-    if(args.vc):
-        processToBeRestarted = processes["vc"]
+    if(args.caller):
+        processToBeRestarted = processes["caller"]
+    elif(args.combine):
+        processToBeRestarted = processes["combine"]
     elif(args.db):
         processToBeRestarted = processes["db"]
     elif(args.filter):
@@ -67,20 +75,19 @@ def restart(args):
     # Iterate through each project
     for project in projects:  
         print(project)
-        for tools in callerToBeRestarted:
-            for process in processToBeRestarted:
-                print(process)
-                deletedProcess = os.path.join(processed, project, tools, process)
-                # If the entire step is to be restarted, 
-                # delete the folder containing the status files.
-                if(os.path.exists(deletedProcess) and not restartStatusFiles):
-                    shutil.rmtree(deletedProcess)
-                #if a certain statusfile is specified, restart only that file
-                elif(restartStatusFiles):
-                    for files in restartStatusFiles:
-                        deletedStatusFile = os.path.join(deletedProcess, files)
-                        if(os.path.exists(deletedStatusFile)):
-                            os.remove(deletedStatusFile)
+        for process in processToBeRestarted:
+            print(process)
+            deletedProcess = os.path.join(processed, project, "FindSV", process)
+            # If the entire step is to be restarted, 
+            # delete the folder containing the status files.
+            if(os.path.exists(deletedProcess) and not restartStatusFiles):
+                shutil.rmtree(deletedProcess)
+            #if a certain statusfile is specified, restart only that file
+            elif(restartStatusFiles):
+                for files in restartStatusFiles:
+                    deletedStatusFile = os.path.join(deletedProcess, files)
+                    if(os.path.exists(deletedStatusFile)):
+                        os.remove(deletedStatusFile)
 
 def initiateProcessFile(available_tools, processed):
     processFiles = {}
@@ -163,6 +170,10 @@ def main(args):
             path_to_bam, available_tools, account, exclude, processFiles,
             processFilesPath)
 
+        #combine the results o the variant claling
+        processFiles = combine.combine(programDirectory, processFiles, 
+                                             processFilesPath, account)
+
         #a function used to build databases from vcf files
         processFiles = database.buildDatabase(programDirectory, processFiles,
                                               processFilesPath, account)
@@ -224,16 +235,14 @@ if __name__ == '__main__':
                             help="Restart the analysis of a variant caller from a chosen pipeline step.\n")
         parser.add_argument('--project', type=str, required=False, default=None,
                             help="Restrict analysis to the specified project.\n")
-        parser.add_argument('--caller', type=str, required=True, 
-                            help=("The variant caller that is to be restarted, "
-                                  "use the list command to get the available "
-                                  "callers, type all to reset all."))
-        parser.add_argument('--vc', action="store_true", required=False, 
-                            help="Restart the selected caller.")
+        parser.add_argument('--caller', type=str, required=False, 
+                            help=("Restarts a selected variant caller (or all)"))
+        parser.add_argument('--combine', action="store_true", required=False,
+                            help="Restart the combination of the caller output")
         parser.add_argument('--db', action="store_true", required=False, 
-                            help="Restart the database creation step of the selected caller.")
+                            help="Restart the database creation step")
         parser.add_argument('--filter', action="store_true", required=False,
-                            help="Restart the database query step of the selected caller.")
+                            help="Restart the database query and database annotation step")
         parser.add_argument('--annotation', action="store_true", required=False,
                             help="Restart the annotation step of the selected caller.")
         parser.add_argument('--status', type=str, default=None,

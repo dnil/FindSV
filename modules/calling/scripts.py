@@ -158,3 +158,38 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n")
 
     return ( [int(common.generateSlurmJob(sbatch_dir,sample_name)), "{}.sv.vcf".format(sample_name)] );
+
+#the function used fermikit
+def Delly(programDirectory,local_dir, sample_name, bam_file,account):
+    #build the sbatch file and submit it
+    sys.path.append(os.path.join(programDirectory,"modules"))  
+    import common
+    sbatch_dir,out_dir,err_dir=common.createFolder(local_dir);
+    output_header = os.path.join(local_dir, sample_name)
+    reference=references(programDirectory,"bwa-indexed-ref");
+
+    with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
+        sbatch.write("#! /bin/bash -l\n")
+        sbatch.write("#SBATCH -A {}\n".format(account))
+        sbatch.write("#SBATCH -o {}/DellyTra_{}.out\n".format(out_dir,sample_name))
+        sbatch.write("#SBATCH -e {}/DellyTra_{}.err\n".format(err_dir,sample_name))
+        sbatch.write("#SBATCH -J DellyTra_{}.job\n".format(sample_name))
+        sbatch.write("#SBATCH -p core\n")
+        sbatch.write("#SBATCH -t 3-00:00:00\n")
+
+        sbatch.write("\n");
+        sbatch.write("\n");
+
+        sbatch.write("module load bioinfo-tools\n")
+        sbatch.write("module load delly\n")
+
+        sbatch.write("\n")
+        sbatch.write("\n")
+        #now tranfer the bam file   
+        sbatch.write("delly -t TRA -o {}.tra.vcf -g {} {}\n".format(output_header,reference,bam_file))
+        sbatch.write("delly -t DEL -o {}.del.vcf -g {} {}\n".format(output_header,reference,bam_file))
+        sbatch.write("delly -t DUP -o {}.dup.vcf -g {} {}\n".format(output_header,reference,bam_file))
+        sbatch.write("delly -t INV -o {}.inv.vcf -g {} {}\n".format(output_header,reference,bam_file))
+        sbatch.write("\n")
+
+    return ( [int(common.generateSlurmJob(sbatch_dir,sample_name)), "{0}.tra.vcf;{0}.del.vcf;{0}.dup.vcf;{0}.inv.vcf".format(sample_name)] );

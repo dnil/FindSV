@@ -55,8 +55,14 @@ def restart(args):
     for project in projects:
         for caller in callerToBeRestarted:
             deletedProcess = os.path.join(processed, project, caller)
-            if(os.path.exists(deletedProcess)):
+            if(os.path.exists(deletedProcess) and not restartStatusFiles):
                 shutil.rmtree(deletedProcess)
+            #if a certain statusfile is specified, restart only that file
+            elif(restartStatusFiles):
+                for files in restartStatusFiles:
+                    deletedStatusFile = os.path.join(deletedProcess, files)
+                    if(os.path.exists(deletedStatusFile)):
+                        os.remove(deletedStatusFile)
         
 
     # Check which steps will be restarted

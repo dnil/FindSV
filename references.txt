@@ -1,2 +1,2 @@
 chromosomes=/proj/b2014152/nobackup/jesperei/references/chromosomes
-bwa-indexed-ref=/proj/b2014152/nobackup/jesperei/references/concat.fa
+bwa-indexed-ref=/proj/b2014152/nobackup/jesperei/references/genome.fa

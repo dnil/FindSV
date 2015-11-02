@@ -60,7 +60,7 @@ def restart(args):
             #if a certain statusfile is specified, restart only that file
             elif(restartStatusFiles):
                 for files in restartStatusFiles:
-                    deletedStatusFile = os.path.join(deletedProcess, files)
+                    deletedStatusFile = os.path.join(deletedProcess,"caller", files)
                     if(os.path.exists(deletedStatusFile)):
                         os.remove(deletedStatusFile)
         

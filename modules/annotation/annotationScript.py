@@ -18,7 +18,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
         sbatch.write("#SBATCH -e {}/annotation_{}.err\n".format(err_dir,sample))
         sbatch.write("#SBATCH -J annotation_{}_{}.job\n".format(sample,tools))
         sbatch.write("#SBATCH -p core\n")
-        sbatch.write("#SBATCH -t 3:00:00\n")
+        sbatch.write("#SBATCH -t 10:00:00\n")
         sbatch.write("#SBATCH -n 1 \n")
 
         sbatch.write("\n");

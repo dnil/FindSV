@@ -68,7 +68,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             for vcf in VCFdictionary[sample]:
                 FileName.append("");
                 filePath=os.path.join(outpath,"{0}.Query.vcf".format(vcf[1]))
-                sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , os.path.join(pathToTool,"database") ,filePath) );
+                sbatch.write("python {0} --hitlimit 1 --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , os.path.join(pathToTool,"database") ,filePath) );
                 FileName[i]="{0}.Query.vcf".format(vcf[1])
                 #add features
                 sbatch.write("\n")

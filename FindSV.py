@@ -1,6 +1,6 @@
 import sys, os, glob, argparse, shutil
 sys.path.append("modules")
-import readConfigFile, calling, filter, annotation, database,combine
+import readConfigFile, calling, filter, annotation, database,combine,cleaning
 import time
 
 #this module restart a selected process of a selected pipeline
@@ -9,11 +9,11 @@ def restart(args):
     (working_dir, path_to_bam, available_tools, account, exclude, 
         processed) = readConfigFile.readConfigFile(programDirectory)
     statusFiles = ["timeout", "failed", "cancelled"]
-    processes = {"caller":["annotation", "filter", "database","combine"],
-                 "combine":["annotation", "filter", "database","combine"],
-                 "db":["annotation", "filter", "database"], 
-                 "filter":["annotation", "filter"], 
-                 "annotation":["annotation"]}
+    processes = {"caller":["annotation", "filter", "database","combine","cleaning"],
+                 "combine":["annotation", "filter", "database","combine","cleaning"],
+                 "db":["annotation", "filter", "database","cleaning"], 
+                 "filter":["annotation", "filter","cleaning"], 
+                 "annotation":["annotation","cleaning"]}
 
     print("Restarting:")
     projects = {}
@@ -194,6 +194,9 @@ def main(args):
         processFiles = annotation.annotation(programDirectory, processFiles, 
                                              processFilesPath, account)
 
+        #the funciton used for cleaning the vcf file, this is the final step of the pipeline
+        processFiles = cleaning.cleaning(programDirectory, processFiles, 
+                                             processFilesPath, account)
     return
 
 if __name__ == '__main__':

@@ -36,7 +36,7 @@ def submit2Cleaning(tools,sample,analysed,programDirectory,account):
             outfile=prefix+outsufix;
 
             FileName.append(outfile)
-            sbatch.write("vcftools --recode --recode-INFO-all --remove-filtered-all --vcf {0} --stdout > {1} \n".format(infile,outfile))
+            sbatch.write("vcftools --recode --recode-INFO-all --remove-filtered-all --vcf {0} --stdout > {1} \n".format(infile,os.path.join(outpath,outfile)))
 
         sbatch.write("\n")
         sbatch.write("\n")

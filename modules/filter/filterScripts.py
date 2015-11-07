@@ -9,30 +9,11 @@ def runScripts(analysisTool,analysedProject,analysed,programDirectory,account):
 def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
-    #get the project path  
 
-    VCFdictionary={};    
+    #get the project path    
     for sample in analysedProject:
-        VCFdictionary[sample]=[];
         path=analysed[analysisTool]["analysed"][sample]["outpath"];
-        project=analysed[analysisTool]["analysed"][sample]["project"];
-        # _ needs to be split from the FindTranslocation vcf name, thus the number of _ present in teh sample must be known
-        N=sample.count('_')
-
     pathToTool=os.path.join(path, analysisTool);
-    #find every vcf beloning to an analysed sample
-    for file in os.listdir(pathToTool):
-        if file.endswith(".vcf"):
-            filename=file.split(".")[0];
-            sample=filename       
-            #join the _ belonging to the file name
-            sample=sample.split("_")
-            sample='_'.join(sample[0:N+1])
-            
-            if(sample in analysedProject):
-                if(analysisTool != "fermiKit" or ( analysisTool == "fermiKit" and "sv" in file.split(".") )):
-                    print("sample in analysed:" + sample);
-                    VCFdictionary[sample].append([os.path.join(pathToTool,file) ,filename])
 
     #find all the features in the feature folder
     path2FeatureFolder=os.path.join(programDirectory,"feature");
@@ -51,7 +32,6 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     for sample in analysedProject:
         analysed[analysisTool]["analysed"][sample]["outputFile"]="";
         with open(os.path.join(sbatch_dir, "{0}.slurm".format(sample)), 'w') as sbatch:
-		
             sbatch.write("#! /bin/bash -l\n")
             sbatch.write("#SBATCH -A {}\n".format(account))
             sbatch.write("#SBATCH -o {0}/filter_{1}.out\n".format(out_dir,sample))
@@ -64,26 +44,24 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             sbatch.write("\n")
             #iterate through every analysed sample, query every vcf of the sample against every db
             FileName=[]
-            i=0;
-            for vcf in VCFdictionary[sample]:
-                FileName.append("");
-                filePath=os.path.join(outpath,"{0}.Query.vcf".format(vcf[1]))
-                sbatch.write("python {0} --hitlimit 1 --variations {1} --db {2} > {3}\n".format(path2Query,vcf[0] , os.path.join(pathToTool,"database") ,filePath) );
-                FileName[i]="{0}.Query.vcf".format(vcf[1])
-                #add features
+            FileName.append("");
+            filePath=os.path.join(outpath,"{0}.Query.vcf".format(sample))
+            input_vcf=join(path,analysed[analysisTool]["analysed"][sample]["outputFile"])
+            sbatch.write("python {0} --hitlimit 1 --variations {1} --db {2} > {3}\n".format(path2Query,input_vcf, os.path.join(pathToTool,"database") ,filePath) );
+            FileName="{0}.Query.vcf".format(sample)
+            #add features
+            sbatch.write("\n")
+            if featureList != "":
+                feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(sample));
+                sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
                 sbatch.write("\n")
-                if featureList != "":
-                    feature_vcf=os.path.join(outpath,"{0}.Feature.vcf".format(vcf[1]));
-                    sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
-                    sbatch.write("\n")
-                    FileName[i]="{0}.Feature.vcf".format(vcf[1])
-                i=i+1
-            analysed[analysisTool]["analysed"][sample]["outputFile"]= ";".join(FileName);
+                FileName="{0}.Feature.vcf".format(sample)
+            analysed[analysisTool]["analysed"][sample]["outputFile"]=FileName;
             sbatch.write("\n")
             sbatch.write("\n")
         
         pid = int(common.generateSlurmJob(sbatch_dir,sample))
-        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":analysed[analysisTool]["analysed"][sample]["outputFile"]}});
+        add2Ongoing.update({sample:{"pid":pid,"outpath":analysed[analysisTool]["analysed"][sample]["outpath"],"project":analysed[analysisTool]["analysed"][sample]["project"],"outputFile":FileName}});
     
     return (add2Ongoing);
 

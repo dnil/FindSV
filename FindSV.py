@@ -171,14 +171,14 @@ def main(args):
         processFiles = initiateProcessFile(available_tools, processFilesPath)
 
         #function used to find variants
-        processFiles = calling.variantCalling(
+        processFiles,bamFilePaths = calling.variantCalling(
             programDirectory, analysis, projectToProcess, working_dir, 
             path_to_bam, available_tools, account, exclude, processFiles,
             processFilesPath)
 
-        #combine the results o the variant claling
+        #combine the results o the variant calling
         processFiles = combine.combine(programDirectory, processFiles, 
-                                             processFilesPath, account)
+                                             processFilesPath, account,bamFilePaths)
 
         #a function used to build databases from vcf files
         processFiles = database.buildDatabase(programDirectory, processFiles,

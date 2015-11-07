@@ -1,13 +1,14 @@
 import os,subprocess,re,sys
 
 
-def submit4combination(tools,sample,combinedProcessFile,programDirectory,account):
+def submit4combination(tools,sample,combinedProcessFile,programDirectory,account,bamFilePath):
     sys.path.append(os.path.join(programDirectory,"modules"))
     import common
 
     outpath=os.path.join(combinedProcessFile[tools]["outpath"],"FindSV")
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
     RTGpath=os.path.join(programDirectory,"programFiles","RTG","rtg")
+    contigSort=os.path.join(programDirectory,"programFiles","ContigSort.py")
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
@@ -49,6 +50,8 @@ def submit4combination(tools,sample,combinedProcessFile,programDirectory,account
         sortedOutput=os.path.join(outpath,sample+".sorted.vcf")
         sbatch.write("{} vcfmerge -o - -F {} > {}\n".format(RTGpath,fileString,output)) 
         sbatch.write( "vcf-sort {} > {}\n".format(output,sortedOutput) )
+        sbatch.write( "python {} --vcf {} --bam {} > {}\n".format(contigSort,sortedOutput,bamFilePath,sortedOutput) )
+        sbatch.write( "rm {}\n".format(output) )
 
     pid = int(common.generateSlurmJob(sbatch_dir,sample))
     add2Ongoing={sample:{"pid":pid,"outpath":combinedProcessFile[tools]["outpath"],"project":combinedProcessFile[tools]["project"],"outputFile":sample+".sorted.vcf"} };

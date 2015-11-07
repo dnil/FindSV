@@ -8,7 +8,7 @@ def submit4combination(tools,sample,combinedProcessFile,programDirectory,account
     outpath=os.path.join(combinedProcessFile[tools]["outpath"],"FindSV")
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
     RTGpath=os.path.join(programDirectory,"programFiles","RTG","rtg")
-    contigSort=os.path.join(programDirectory,"programFiles","ContigSort.py")
+    contigSort=os.path.join(programDirectory,"programFiles","contigSort.py")
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
@@ -24,6 +24,7 @@ def submit4combination(tools,sample,combinedProcessFile,programDirectory,account
         sbatch.write("\n");
         sbatch.write("module load bioinfo-tools\n");
         sbatch.write("module load vcftools\n");
+        sbatch.write("module load samtools\n");
         vcfPath=[];
         #sort each caller output file
         for tool in combinedProcessFile:

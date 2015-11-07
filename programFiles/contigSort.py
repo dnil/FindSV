@@ -11,7 +11,7 @@ def main(args,parser):
             chromosome=content[1].strip().split(":")[1]
             chromosome_order.append(chromosome)
     vcf_content={};
-    with open(args.vcf, "w") as text_file:
+    with open(args.vcf) as text_file:
         for line in text_file:
             chromosome=line.split("\t")[0];
             if chromosome in vcf_content:

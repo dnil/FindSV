@@ -51,10 +51,9 @@ def submit4combination(tools,sample,combinedProcessFile,programDirectory,account
         sortedOutput=os.path.join(outpath,sample+".sorted.vcf")
         sbatch.write("{} vcfmerge -o - -F {} > {}\n".format(RTGpath,fileString,output)) 
         sbatch.write( "vcf-sort {} > {}\n".format(output,sortedOutput) )
-        sbatch.write( "python {} --vcf {} --bam {} > {}\n".format(contigSort,sortedOutput,bamFilePath,sortedOutput) )
-        sbatch.write( "rm {}\n".format(output) )
-
+        sbatch.write( "python {} --vcf {} --bam {} > {}\n".format(contigSort,sortedOutput,bamFilePath,output) )
+        sbatch.write( "rm {}\n".format(sortedOutput) )
     pid = int(common.generateSlurmJob(sbatch_dir,sample))
-    add2Ongoing={sample:{"pid":pid,"outpath":combinedProcessFile[tools]["outpath"],"project":combinedProcessFile[tools]["project"],"outputFile":sample+".sorted.vcf"} };
+    add2Ongoing={sample:{"pid":pid,"outpath":combinedProcessFile[tools]["outpath"],"project":combinedProcessFile[tools]["project"],"outputFile":sample+".vcf"} };
     
     return (add2Ongoing);

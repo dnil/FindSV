@@ -43,7 +43,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             sbatch.write("\n")
             #iterate through every analysed sample, query every vcf of the sample against every db
             filePath=os.path.join(outpath,"{0}.Query.vcf".format(sample))
-            input_vcf=os.path.join(inpath,sample+".vcf)
+            input_vcf=os.path.join(inpath,sample+".vcf")
             sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,input_vcf, os.path.join(pathToTool,"database") ,filePath) );
             FileName="{0}.Query.vcf".format(sample)
             #add features

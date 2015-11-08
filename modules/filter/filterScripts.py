@@ -21,7 +21,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     for file in os.listdir(path2FeatureFolder):
         if file.endswith(".tab") or file.endswith(".bed") or file.endswith(".txt"):    
             featureList += " " + os.path.join(path2FeatureFolder,file);
-    
+    inpath=os.path.join(path,analysisTool);
     outpath=os.path.join(path,analysisTool,"filtered");
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
 
@@ -30,7 +30,6 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     path2Features = os.path.join(programDirectory,"programFiles","FindTranslocations","scipts","screen_results.py")
     add2Ongoing={};
     for sample in analysedProject:
-        analysed[analysisTool]["analysed"][sample]["outputFile"]="";
         with open(os.path.join(sbatch_dir, "{0}.slurm".format(sample)), 'w') as sbatch:
             sbatch.write("#! /bin/bash -l\n")
             sbatch.write("#SBATCH -A {}\n".format(account))
@@ -43,10 +42,8 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             sbatch.write("\n")
             sbatch.write("\n")
             #iterate through every analysed sample, query every vcf of the sample against every db
-            FileName=[]
-            FileName.append("");
             filePath=os.path.join(outpath,"{0}.Query.vcf".format(sample))
-            input_vcf=os.path.join(path,analysed[analysisTool]["analysed"][sample]["outputFile"])
+            input_vcf=os.path.join(inpath,sample+".vcf)
             sbatch.write("python {0} --hitlimit 1 --variations {1} --db {2} > {3}\n".format(path2Query,input_vcf, os.path.join(pathToTool,"database") ,filePath) );
             FileName="{0}.Query.vcf".format(sample)
             #add features

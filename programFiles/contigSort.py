@@ -32,7 +32,7 @@ def main(args,parser):
     for chromosome in chromosome_order:
         positions={}
         for line in vcf_content[chromosome]:
-            pos=line.split("\t")[1]
+            pos=int(line.split("\t")[1])
             if pos in positions:
                 positions[pos].append(line)
             else:

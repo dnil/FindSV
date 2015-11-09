@@ -19,7 +19,15 @@ def main(args,parser):
                 meta_data+=line
             else:
                 chromosome=line.split("\t")[0];
-                vcf_content[chromosome].append(line);
+                #if the caller output is correct according to the bam reference
+                if chromosome in vcf_content:
+                    vcf_content[chromosome].append(line);
+                #add chr prefix if needed
+                elif "chr"+chromosome in vcf_content:
+                    vcf_content["chr"+chromosome].append("chr"+line);
+                #remove chr if needed
+                elif chromosome[3:] in vcf_content:
+                    vcf_content[chromosome[3:]].append(line[3:]);
     print(meta_data.strip())
     for chromosome in chromosome_order:
         for line in vcf_content[chromosome]:

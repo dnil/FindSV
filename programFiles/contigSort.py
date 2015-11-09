@@ -30,8 +30,16 @@ def main(args,parser):
                     vcf_content[chromosome[3:]].append(line[3:]);
     print(meta_data.strip())
     for chromosome in chromosome_order:
+        positions={}
         for line in vcf_content[chromosome]:
-            print(line.strip())
+            pos=line.split("\t")[1]
+            if pos in positions:
+                positions[pos].append(line)
+            else:
+                positions[pos]=[line]
+        for pos in sorted(positions):
+            for variant in positions[pos]:
+                print(variant.strip())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("""Uses samtools to read the header data of a bam file, accepts a vcf and sorts the contigs of the vcf according to the contig order, the output is printed to stdout""")

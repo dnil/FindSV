@@ -7,7 +7,7 @@ def submit4combination(tools,sample,combinedProcessFile,programDirectory,account
 
     outpath=os.path.join(combinedProcessFile[tools]["outpath"],"FindSV")
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
-    RTGpath=os.path.join(programDirectory,"programFiles","RTG","rtg")
+    mergepath=os.path.join(programDirectory,"programFiles","mergeVCF.py")
     contigSort=os.path.join(programDirectory,"programFiles","contigSort.py")
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample)), 'w') as sbatch:
@@ -27,30 +27,18 @@ def submit4combination(tools,sample,combinedProcessFile,programDirectory,account
         sbatch.write("module load samtools\n");
         vcfPath=[];
         #sort each caller output file
+        fileString=''
         for tool in combinedProcessFile:
             files=combinedProcessFile[tool]["outputFile"]
             files=files.strip().split(";")
-            
             for vcf in files:
-                sortedvcf=os.path.join(combinedProcessFile[tools]["outpath"],tool,"sorted_"+vcf)
                 vcf=os.path.join(combinedProcessFile[tools]["outpath"],tool,vcf)
-                vcfPath.append(sortedvcf)
-                sbatch.write( "vcf-sort {} > {}\n".format(vcf,sortedvcf) ) 
-        #index and compress the files
-        fileString=''
-        for files in vcfPath:
-            #clear up from previous runs
-            sbatch.write( "rm {}.gz\n".format(files) )
-
-            sbatch.write( "{} bgzip {}\n".format(RTGpath,files) )
-            sbatch.write( "{} index -f vcf {}.gz\n".format(RTGpath,files) )
-            fileString += files+".gz "
+                fileString += vcf + " "
 
         #merge the files          
         output=os.path.join(outpath,sample+".vcf")
-        sortedOutput=os.path.join(outpath,sample+".sorted.vcf")
-        sbatch.write("{} vcfmerge -o - -F {} > {}\n".format(RTGpath,fileString,output)) 
-        sbatch.write( "vcf-sort {} > {}\n".format(output,sortedOutput) )
+        sortedOutput=os.path.join(outpath,sample+".merged.vcf")
+        sbatch.write("python {} --vcf {} > {}\n".format(mergepath,fileString,sortedOutput)) 
         sbatch.write( "python {} --vcf {} --bam {} > {}\n".format(contigSort,sortedOutput,bamFilePath,output) )
         sbatch.write( "rm {}\n".format(sortedOutput) )
     pid = int(common.generateSlurmJob(sbatch_dir,sample))

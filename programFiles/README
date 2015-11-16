@@ -1,7 +1,0 @@
-Run the install script after downloading the FindSV pipeline, note the programfiles folder must be the working directory or the installation of vep wont work
-
-The script runs the following command to install VEP:
-perl INSTALL.pl --AUTO ac --s homo_sapiens --ASSEMBLY GRCh37
-thus, to analyse other species than humans, the --s option aswell as
-the --ASSEMBLY option should be changed accordingly.
-

@@ -16,18 +16,15 @@ def main(args,parser):
                 if(line[0] == "#"):
                     if("#CHROM\tPOS" in line):
                         break
-                    else:
+                    elif "##ALT=" in line  or "##INFO=" in line or "##FILTER=" in line  or "##FORMAT=" in line:
+                        field=line.split("=")[2].split(",")[0]
                         if("##ALT=" in line):
-                            field=line.strip("##ALT=<ID=").split(",")[0]
                             header["ALT"].update({field:line})
                         elif("##INFO=" in line):
-                            field=line.strip("##INFO=<ID=").split(",")[0]
                             header["INFO"].update({field:line})
                         elif("##FILTER=" in line):
-                            field=line.strip("##FILTER=<ID=").split(",")[0]
                             header["FILTER"].update({field:line})
                         elif("##FORMAT=" in line):
-                            field=line.strip("##FORMAT=<ID=").split(",")[0]
                             header["FORMAT"].update({field:line})
                 else:
                     break

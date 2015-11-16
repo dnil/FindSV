@@ -30,7 +30,7 @@ def submit2Cleaning(tools,sample,analysed,programDirectory,account):
         FileName=[];
 
         for file in files:
-            infile=file;
+            infile=os.path.join(path2Input,file);
             outsufix=".cleaned.vcf"
             prefix=file.rsplit(".",1)[0]
             outfile=prefix+outsufix;

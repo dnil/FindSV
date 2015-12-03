@@ -66,6 +66,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("cnvnator -root {0}.root -partition 200 \n".format(output_header))
         sbatch.write("cnvnator -root {0}.root -call 200 > {1}.cnvnator.out \n".format(output_header,output_header));
         sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.vcf \n".format(output_header,output_header));
+        sbatch.write("rm {0}.root\n".format(output_header));
         sbatch.write("\n")
         sbatch.write("\n")
 
@@ -108,6 +109,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
         
         sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 6 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
+        sbatch.write("rm {0}.tab\n".format(output_header))
         sbatch.write("\n")
         sbatch.write("\n")
 

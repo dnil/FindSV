@@ -98,6 +98,8 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     if not (os.path.isfile(bai_file)):
         bai_file=bam_file+".bai";
 
+
+
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
         sbatch.write("#SBATCH -A {}\n".format(account))
@@ -131,8 +133,10 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         #now tranfer the bam file   
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
+
+	sbatch.write("if [[ -z {} ]] ; then samtools index {} ; fi\n".format(bai_file, bam_file))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
-        
+
         sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 6 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
         sbatch.write("rm {0}.tab\n".format(output_header))
         sbatch.write("\n")

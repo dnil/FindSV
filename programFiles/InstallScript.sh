@@ -11,6 +11,8 @@ cd ../bin
 chmod a+x FindTranslocations
 cd ../..
 
+cpanm Archive::Extract Archive::Zip DBI DBD::mysql CGI LWP::Simple LWP::Protocol::https
+
 #install VEP
 curl -LO "https://github.com/Ensembl/ensembl-tools/archive/release/81.zip"
 unzip 81.zip

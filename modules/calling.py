@@ -5,7 +5,7 @@ sys.path.append("calling")
 import scripts,common
 
 #function used to find variants
-def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,exclude,processFiles,processed):
+def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,modules,exclude,processFiles,processed):
         project_name=projectToProcess
         bamFilePath={}
         if not project_name.startswith('.') and project_name not in exclude.keys() and not os.path.islink(os.path.join(analysis, project_name)):
@@ -43,7 +43,7 @@ def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_t
                         else:
                             # sample state is NEW
                             # submit this sample, if submission works fine store it in under analysis with the PID 
-                            call="scripts." + tools+"(\""+programDirectory+"\",\""+local_project_dir+"/"+tools+"\",\""+sample_name+"\",\""+os.path.join(path_to_sample, file)+"\",\""+account+"\")"
+                            call="scripts." + tools+"(\""+programDirectory+"\",\""+local_project_dir+"/"+tools+"\",\""+sample_name+"\",\""+os.path.join(path_to_sample, file)+"\",\""+account+"\",\""+str(modules)+"\")"
                             callerOutput = eval(call)
                             processFiles[tools]["ongoing"][sample_name] = {"pid":callerOutput[0],"project":project_name,"outpath": local_project_dir,"outputFile":callerOutput[1]}
                             print "sample {0} LAUNCHED".format(sample_name)

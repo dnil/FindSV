@@ -46,7 +46,14 @@ def readConfigFile(programDirectory):
 				if(processed == "default"):
 					processed=os.path.join(programDirectory,"analysed");
 
-
+			if(option[0]=="uppmax"):
+				# use module system etc on a machine 
+				# similar to UPPMAX standard layout
+				uppmax = option[1]
+				if(uppmax == "yes"):
+					modules=True;
+				else:
+					modules=False;
 
 	#remove the excluded tools from the available tools list
 	available_tools=list(set(available_tools) - set(excluded_tools))
@@ -57,4 +64,4 @@ def readConfigFile(programDirectory):
 	for projects in excluded_projects:
 		exclude[projects]="";
 
-	return(working_dir,path_to_bam,available_tools,account,exclude,processed)
+	return(working_dir,path_to_bam,available_tools,account,exclude,processed,modules)

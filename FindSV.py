@@ -1,3 +1,4 @@
+
 import sys, os, glob, argparse, shutil
 sys.path.append("modules")
 import readConfigFile, calling, filter, annotation, database,combine,cleaning
@@ -7,7 +8,7 @@ import time
 def restart(args):
     programDirectory = os.path.dirname(os.path.abspath(__file__))
     (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed) = readConfigFile.readConfigFile(programDirectory)
+        processed,modules) = readConfigFile.readConfigFile(programDirectory)
     statusFiles = ["timeout", "failed", "cancelled"]
     processes = {"caller":["annotation", "filter", "database","combine","cleaning"],
                  "combine":["annotation", "filter", "database","combine","cleaning"],
@@ -157,7 +158,7 @@ def main(args):
     
     # Read the config file
     (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed) = readConfigFile.readConfigFile(programDirectory)
+        processed,modules) = readConfigFile.readConfigFile(programDirectory)
 
     for project in projects:
         analysis = projects[project]
@@ -173,7 +174,7 @@ def main(args):
         #function used to find variants
         processFiles,bamFilePaths = calling.variantCalling(
             programDirectory, analysis, projectToProcess, working_dir, 
-            path_to_bam, available_tools, account, exclude, processFiles,
+            path_to_bam, available_tools, account, modules, exclude, processFiles,
             processFilesPath)
 
         #combine the results o the variant calling

@@ -2,11 +2,19 @@ import os
 import subprocess
 import re
 import sys
-#this module contains all the variant calling tools available to the pipeline, scripts may be added or removed as needed. Every tools should be stored in a separate function. the function arguments are the
-#programDirectory, which is the path to FindSV. local_dir, which is the output folder of the main script, the sample_name, which is the name of the sample, and the bam_file which is the path to the bam file
-# and lastly account, which is the slurm account
-#Each function must output a list containing the  slurm_job ID and the name of the output vcf
-#The concent of each function is a printer of an sbatch file, the sbatch file is printed to the output folder and started using slurm.
+
+#This module contains all the variant calling tools available to the
+#pipeline, scripts may be added or removed as needed. Every tool
+#should be stored in a separate function. The function arguments are
+#the programDirectory, which is the path to FindSV. local_dir, which
+#is the output folder of the main script, the sample_name, which is
+#the name of the sample, and the bam_file which is the path to the bam
+#file and lastly account, which is the slurm account as well as
+#modules, a boolean indicating if the SNIC module system and SNIC_TMP
+#should be used. Each function must output a list containing the
+#slurm_job ID and the name of the output vcf The concent of each
+#function is a printer of an sbatch file, the sbatch file is printed
+#to the output folder and started using slurm.
 
 #This function is used to search the reference file for the path of the references.
 def references(programDirectory,reference):
@@ -21,7 +29,7 @@ def references(programDirectory,reference):
 	return(referencePath);
 
 #the function used to run CNVnator
-def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
+def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
 
@@ -46,20 +54,27 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n");
         sbatch.write("\n");
 
-        sbatch.write("module load bioinfo-tools\n")
-        sbatch.write("module load bwa\n")
-        sbatch.write("module load samtools\n")
-        sbatch.write("module load CNVnator\n")
+	# If we are on a machine with the SNIC modules installed
+	if(modules == True):
+		sbatch.write("module load bioinfo-tools\n")
+		sbatch.write("module load bwa\n")
+		sbatch.write("module load samtools\n")
+		sbatch.write("module load CNVnator\n")
 
-        sbatch.write("\n")
-        sbatch.write("\n")
-        #now tranfer the bam file   
-		
+		sbatch.write("\n")
+		sbatch.write("\n")
+	
+	# If we are on a non-SNIC system, chances are there is no 
+	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
+	# to /tmp. 
+	sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
 
-        sbatch.write("mkdir -p $SNIC_TMP/{0}\n".format(sample_name))
-        sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bam_file, sample_name))
-        #sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
-        
+        # now transfer the bam file
+
+	sbatch.write("mkdir -p $SNIC_TMP/{0}\n".format(sample_name))
+	sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bam_file, sample_name))
+	#sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
+       	
         sbatch.write("cnvnator -root {0}.root -tree $SNIC_TMP/{1}/{2} \n".format(output_header,sample_name, os.path.split(bam_file)[1]) );
         sbatch.write("cnvnator -root {0}.root -his 200 -d {1}\n".format(output_header,chrFolder));
         sbatch.write("cnvnator -root {0}.root -stat 200 >> {1}.cnvnator.log \n".format(output_header,output_header));
@@ -73,7 +88,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account):
     return ([ int(common.generateSlurmJob(sbatch_dir,sample_name)), "{}.vcf".format(sample_name) ] );
 
 #the function used to run FindTranslocations
-def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account):
+def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account,modules):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
     #build the sbatch file and submit it
@@ -82,6 +97,8 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     bai_file      = re.sub('m$', 'i', bam_file) # remove the final m and add and i
     if not (os.path.isfile(bai_file)):
         bai_file=bam_file+".bai";
+
+
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
@@ -96,18 +113,30 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("\n");
         sbatch.write("\n");
 
-        sbatch.write("module load bioinfo-tools\n")
-        sbatch.write("module load bwa\n")
-        sbatch.write("module load samtools\n")
+	# If we are on a machine with the SNIC modules installed
+	if(modules == True):
+		sbatch.write("module load bioinfo-tools\n")
+		sbatch.write("module load bwa\n")
+		sbatch.write("module load samtools\n")
+
         sbatch.write("FINDTRANS={}/programFiles/FindTranslocations/bin/FindTranslocations\n".format(programDirectory))
 
         sbatch.write("\n")
         sbatch.write("\n")
+
+	# If we are on a non-SNIC system, chances are there is no 
+	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
+	# to /tmp. 
+	sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
+
+
         #now tranfer the bam file   
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
+
+	sbatch.write("if [[ -z {} ]] ; then samtools index {} ; fi\n".format(bai_file, bam_file))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
-        
+
         sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 6 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
         sbatch.write("rm {0}.tab\n".format(output_header))
         sbatch.write("\n")
@@ -116,7 +145,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     return ( [int(common.generateSlurmJob(sbatch_dir,sample_name)),"{0}_inter_chr_events.vcf;{0}_intra_chr_events.vcf".format(sample_name)] );
 
 #the function used fermikit
-def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
+def fermiKit(programDirectory,local_dir, sample_name, bam_file,account,modules):
     #build the sbatch file and submit it
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
@@ -136,14 +165,22 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n");
         sbatch.write("\n");
 
-        sbatch.write("module load bioinfo-tools\n")
-        sbatch.write("module load bwa\n")
-        sbatch.write("module load samtools\n")
-        sbatch.write("module load fermikit\n")
+	if(modules == True):
+		sbatch.write("module load bioinfo-tools\n")
+		sbatch.write("module load bwa\n")
+		sbatch.write("module load samtools\n")
+		sbatch.write("module load fermikit\n")
 
-        sbatch.write("\n")
-        sbatch.write("\n")
-        #now tranfer the bam file   
+		sbatch.write("\n")
+		sbatch.write("\n")
+
+        #now transfer the bam file   
+
+	# If we are on a non-SNIC system, chances are there is no 
+	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
+	# to /tmp. 
+	sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
+
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
         sbatch.write("samtools bam2fq $SNIC_TMP/{0}/{1} > $SNIC_TMP/{0}/output.fastq\n".format(sample_name,os.path.split(bam_file)[1]))
@@ -162,7 +199,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account):
     return ( [int(common.generateSlurmJob(sbatch_dir,sample_name)), "{}.sv.vcf".format(sample_name)] );
 
 #the function used fermikit
-def Delly(programDirectory,local_dir, sample_name, bam_file,account):
+def Delly(programDirectory,local_dir, sample_name, bam_file,account,modules):
     #build the sbatch file and submit it
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
@@ -182,12 +219,16 @@ def Delly(programDirectory,local_dir, sample_name, bam_file,account):
         sbatch.write("\n");
         sbatch.write("\n");
 
-        sbatch.write("module load bioinfo-tools\n")
-        sbatch.write("module load delly\n")
+	if(modules == True):
+		sbatch.write("module load bioinfo-tools\n")
+		sbatch.write("module load delly\n")
 
-        sbatch.write("\n")
-        sbatch.write("\n")
-        #now tranfer the bam file   
+		sbatch.write("\n")
+		sbatch.write("\n")
+
+        # now transfer the bam file   
+
+
         sbatch.write("delly -t TRA -o {}.tra.vcf -g {} {}\n".format(output_header,reference,bam_file))
         sbatch.write("delly -t DEL -o {}.del.vcf -g {} {}\n".format(output_header,reference,bam_file))
         sbatch.write("delly -t DUP -o {}.dup.vcf -g {} {}\n".format(output_header,reference,bam_file))

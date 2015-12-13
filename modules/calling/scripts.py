@@ -76,10 +76,10 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
 	#sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
        	
         sbatch.write("cnvnator -root {0}.root -tree $SNIC_TMP/{1}/{2} \n".format(output_header,sample_name, os.path.split(bam_file)[1]) );
-        sbatch.write("cnvnator -root {0}.root -his 200 -d {1}\n".format(output_header,chrFolder));
-        sbatch.write("cnvnator -root {0}.root -stat 200 >> {1}.cnvnator.log \n".format(output_header,output_header));
-        sbatch.write("cnvnator -root {0}.root -partition 200 \n".format(output_header))
-        sbatch.write("cnvnator -root {0}.root -call 200 > {1}.cnvnator.out \n".format(output_header,output_header));
+        sbatch.write("cnvnator -root {0}.root -his 1000 -d {1}\n".format(output_header,chrFolder));
+        sbatch.write("cnvnator -root {0}.root -stat 1000 >> {1}.cnvnator.log \n".format(output_header,output_header));
+        sbatch.write("cnvnator -root {0}.root -partition 1000 \n".format(output_header))
+        sbatch.write("cnvnator -root {0}.root -call 1000 > {1}.cnvnator.out \n".format(output_header,output_header));
         sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.vcf \n".format(output_header,output_header));
         sbatch.write("rm {0}.root\n".format(output_header));
         sbatch.write("\n")

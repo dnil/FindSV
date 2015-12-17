@@ -26,7 +26,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     #check for a genmod file in the genmod folder
     path2GenmodFolder=os.path.join(programDirectory,"genmod");
     genmod="";
-    for file in os.listdir(path2FeatureFolder):
+    for file in os.listdir(path2GenmodFolder):
         if file.endswith(".ini") or file.endswith(".txt"):    
             genmod = os.path.join(path2GenmodFolder,file)
 

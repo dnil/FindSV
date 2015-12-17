@@ -21,6 +21,15 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
     for file in os.listdir(path2FeatureFolder):
         if file.endswith(".tab") or file.endswith(".bed") or file.endswith(".txt"):    
             featureList += " " + os.path.join(path2FeatureFolder,file);
+
+
+    #check for a genmod file in the genmod folder
+    path2GenmodFolder=os.path.join(programDirectory,"genmod");
+    genmod="";
+    for file in os.listdir(path2FeatureFolder):
+        if file.endswith(".ini") or file.endswith(".txt"):    
+            genmod = os.path.join(path2GenmodFolder,file)
+
     inpath=os.path.join(path,analysisTool);
     outpath=os.path.join(path,analysisTool,"filtered");
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
@@ -46,6 +55,7 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             input_vcf=os.path.join(inpath,sample+".vcf")
             sbatch.write("python {0} --variations {1} --db {2} > {3}\n".format(path2Query,input_vcf, os.path.join(pathToTool,"database") ,filePath) );
             FileName="{0}.Query.vcf".format(sample)
+
             #add features
             sbatch.write("\n")
             if featureList != "":
@@ -53,6 +63,12 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                 sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
                 sbatch.write("\n")
                 FileName="{0}.Feature.vcf".format(sample)
+            sbatch.write("\n")
+            #generate genmod
+            if genmod != "":
+                sbatch.write("genmod --score -c {0} {1} > {1}.tmp\n".format(genmod,FileName) );
+                sbatch.write("mv {0}.tmp {0}\n".format(FileName));
+                
             analysed[analysisTool]["analysed"][sample]["outputFile"]=FileName;
             sbatch.write("\n")
             sbatch.write("\n")

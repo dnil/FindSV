@@ -24,6 +24,9 @@ rm 81.zip
 cd ensembl-tools-release-81/scripts/variant_effect_predictor/
 perl INSTALL.pl --AUTO ac --s homo_sapiens --ASSEMBLY GRCh37
 
+#install genmod
+pip install genmod
+
 #install CNVnator
 
 # wget http://sv.gersteinlab.org/cnvnator/CNVnator_v0.3.zip

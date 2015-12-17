@@ -2,7 +2,7 @@ import os,sys
 sys.path.append("modules/database")
 sys.path.append("modules")
 sys.path.append("")
-import submitToDatabase,common,time
+import submitToDatabase,common,time,process
 
 
 def buildDatabase(programDirectory,previousProcessFiles,processed,account):
@@ -10,14 +10,13 @@ def buildDatabase(programDirectory,previousProcessFiles,processed,account):
     processFiles=common.readProcessFiles(previousProcessFiles,processed,"database")
 
         
-    #create a dictionay containing the samples that are yet to be run through build db
+    #create a dictionary containing the samples that are yet to be run through build db
     newsamples={}
     for tool in previousProcessFiles:
         newsamples[tool]={}
         for sample in previousProcessFiles[tool]["analysed"]:
             if sample not in processFiles[tool]["ongoing"] and sample not in processFiles[tool]["analysed"] and sample not in processFiles[tool]["cancelled"] and sample not in processFiles[tool]["failed"] and sample not in processFiles[tool]["excluded"] and sample not in processFiles[tool]["timeout"]:
                 newsamples[tool].update({sample:previousProcessFiles[tool]["analysed"][sample]})
-
 
     #check if any of the ongoing samples are finished, and add finished samples to the finished dictionary
     for tools in processFiles:
@@ -44,6 +43,10 @@ def buildDatabase(programDirectory,previousProcessFiles,processed,account):
             processFiles[tools]["ongoing"].update({sample:newsamples[tools][sample]})
             processFiles[tools]["ongoing"][sample]["pid"]=databaseOutput[0];
             processFiles[tools]["ongoing"][sample]["outputFile"]=databaseOutput[1];
+            project=processFiles[tools]["ongoing"][sample]["project"]
+        if newamples[tool]:
+            step["filter"]=True
+            process.restart(programDirectory,step,project,"all")
 
     common.UpdateProcessFiles(processFiles,processed,"database")
 

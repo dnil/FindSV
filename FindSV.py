@@ -1,100 +1,8 @@
 
 import sys, os, glob, argparse, shutil
 sys.path.append("modules")
-import readConfigFile, calling, filter, annotation, database,combine,cleaning
+import readConfigFile, calling, filter, annotation, database,combine,cleaning,process
 import time
-
-#this module restart a selected process of a selected pipeline
-def restart(args):
-    programDirectory = os.path.dirname(os.path.abspath(__file__))
-    (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed,modules) = readConfigFile.readConfigFile(programDirectory)
-    statusFiles = ["timeout", "failed", "cancelled"]
-    processes = {"caller":["annotation", "filter", "database","combine","cleaning"],
-                 "combine":["annotation", "filter", "database","combine","cleaning"],
-                 "db":["annotation", "filter", "database","cleaning"], 
-                 "filter":["annotation", "filter","cleaning"], 
-                 "annotation":["annotation","cleaning"]}
-
-    print("Restarting:")
-    projects = {}
-    with open(os.path.join(programDirectory, "project.txt")) as ongoing_fd:
-        for line in ongoing_fd:
-            if line[0] != "#":
-                info = line.split("\t")
-                projects[info[0].rstrip()] = info[1].rstrip()     
-
-    #check if any project i selected
-    if args.project:
-        projectToProcess  =  args.project
-        tmpProject = {}
-        tmpProject[projectToProcess] = projects[projectToProcess]
-        projects = tmpProject
-
-    #check if any status file is selected
-    restartStatusFiles = []
-    if args.status:
-        if args.status == "all":
-            restartStatusFiles = statusFiles
-        elif args.status in statusFiles:
-            restartStatusFiles = [args.status]
-        else:
-            print("Invalid status file.")
-            return(0)
-
-    #check which caller is selected
-    callerToBeRestarted = []
-    if args.caller == "all":
-        print("All callers are being restarted!")
-        for tools in available_tools:
-            callerToBeRestarted.append(tools)
-    else:
-        if args.caller in available_tools:
-            callerToBeRestarted.append(args.caller)
-
-    #restart the callers by removing the status files
-    for project in projects:
-        for caller in callerToBeRestarted:
-            deletedProcess = os.path.join(processed, project, caller)
-            if(os.path.exists(deletedProcess) and not restartStatusFiles):
-                shutil.rmtree(deletedProcess)
-            #if a certain statusfile is specified, restart only that file
-            elif(restartStatusFiles):
-                for files in restartStatusFiles:
-                    deletedStatusFile = os.path.join(deletedProcess,"calling", files)
-                    if(os.path.exists(deletedStatusFile)):
-                        os.remove(deletedStatusFile)
-        
-
-    # Check which steps will be restarted
-    processToBeRestarted = []
-    if(args.caller):
-        processToBeRestarted = processes["caller"]
-    elif(args.combine):
-        processToBeRestarted = processes["combine"]
-    elif(args.db):
-        processToBeRestarted = processes["db"]
-    elif(args.filter):
-        processToBeRestarted = processes["filter"]
-    elif(args.annotation):
-        processToBeRestarted = processes["annotation"]
-
-    # Iterate through each project
-    for project in projects:  
-        print(project)
-        for process in processToBeRestarted:
-            print(process)
-            deletedProcess = os.path.join(processed, project, "FindSV", process)
-            # If the entire step is to be restarted, 
-            # delete the folder containing the status files.
-            if(os.path.exists(deletedProcess) and not restartStatusFiles):
-                shutil.rmtree(deletedProcess)
-            #if a certain statusfile is specified, restart only that file
-            elif(restartStatusFiles):
-                for files in restartStatusFiles:
-                    deletedStatusFile = os.path.join(deletedProcess, files)
-                    if(os.path.exists(deletedStatusFile)):
-                        os.remove(deletedStatusFile)
 
 def initiateProcessFile(available_tools, processed):
     processFiles = {}
@@ -258,7 +166,21 @@ if __name__ == '__main__':
         parser.add_argument('--status', type=str, default=None,
                             help="Restart one of the status files (failed, timeout, cancelled, all).")
         args = parser.parse_args()
-        restart(args)
+
+        step={}
+        if args.caller:
+            step["caller"]=args.caller
+        elif args.combine:
+            step["combine"]=True
+        elif args.db:
+            step["db"]=True
+        elif args.filter:
+            step["filter"]=True
+        elif args.annotation:
+            step["annotation"]=True
+
+        programDirectory = os.path.dirname(os.path.abspath(__file__))
+        process.restart(programDirectory,step,args.project,args.status)
     elif(args.manage):
         parser = argparse.ArgumentParser(
             "the manage module: manage the samples and projects of the pipeline")

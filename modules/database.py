@@ -45,6 +45,7 @@ def buildDatabase(programDirectory,previousProcessFiles,processed,account):
             processFiles[tools]["ongoing"][sample]["outputFile"]=databaseOutput[1];
             project=processFiles[tools]["ongoing"][sample]["project"]
         if newsamples[tool]:
+            step={}
             step["filter"]=True
             process.restart(programDirectory,step,project,"all")
 

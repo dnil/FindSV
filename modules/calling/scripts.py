@@ -55,7 +55,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
         sbatch.write("\n");
 
 	# If we are on a machine with the SNIC modules installed
-	if(modules == True):
+	if(modules == "True"):
 		sbatch.write("module load bioinfo-tools\n")
 		sbatch.write("module load bwa\n")
 		sbatch.write("module load samtools\n")
@@ -114,7 +114,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("\n");
 
 	# If we are on a machine with the SNIC modules installed
-	if(modules == True):
+	if(modules == "True"):
 		sbatch.write("module load bioinfo-tools\n")
 		sbatch.write("module load bwa\n")
 		sbatch.write("module load samtools\n")
@@ -165,7 +165,7 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account,modules):
         sbatch.write("\n");
         sbatch.write("\n");
 
-	if(modules == True):
+	if(modules == "True"):
 		sbatch.write("module load bioinfo-tools\n")
 		sbatch.write("module load bwa\n")
 		sbatch.write("module load samtools\n")
@@ -219,7 +219,7 @@ def Delly(programDirectory,local_dir, sample_name, bam_file,account,modules):
         sbatch.write("\n");
         sbatch.write("\n");
 
-	if(modules == True):
+	if(modules == "True"):
 		sbatch.write("module load bioinfo-tools\n")
 		sbatch.write("module load delly\n")
 

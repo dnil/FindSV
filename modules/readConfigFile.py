@@ -49,7 +49,7 @@ def readConfigFile(programDirectory):
 			if(option[0]=="uppmax"):
 				# use module system etc on a machine 
 				# similar to UPPMAX standard layout
-				uppmax = option[1]
+				uppmax = option[1].strip();
 				if(uppmax == "yes"):
 					modules=True;
 				else:

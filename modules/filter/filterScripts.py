@@ -63,11 +63,10 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
                 sbatch.write("python {0} --variations {1} --bed-files {2} > {3}\n".format(path2Features, filePath , featureList ,feature_vcf) );
                 sbatch.write("\n")
                 FileName="{0}.Feature.vcf".format(sample)
-            sbatch.write("\n")
             #generate genmod
             if genmod != "":
                 filePath=os.path.join(outpath,FileName)
-                sbatch.write("genmod --score -c {0} {1} > {1}.tmp\n".format(genmod,FilePath) );
+                sbatch.write("genmod score -c {0} {1} > {1}.tmp\n".format(genmod,FilePath) );
                 sbatch.write("mv {0}.tmp {0}\n".format(FilePath);
                 
             analysed[analysisTool]["analysed"][sample]["outputFile"]=FileName;

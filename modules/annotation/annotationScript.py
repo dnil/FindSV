@@ -11,6 +11,16 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
     outpath=os.path.join(samplePath,"annotation");
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
 
+
+    #check for a genmod file in the genmod folder
+    path2GenmodFolder=os.path.join(programDirectory,"genmod");
+    genmod="";
+    for file in os.listdir(path2GenmodFolder):
+        if file.endswith(".ini") or file.endswith(".txt"):    
+            genmod = os.path.join(path2GenmodFolder,file)
+
+
+
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample)), 'w') as sbatch:
         sbatch.write("#! /bin/bash -l\n")
         sbatch.write("#SBATCH -A {}\n".format(account))
@@ -38,6 +48,11 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
             FileName.append(outfile)
             sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 5 --port 3337 --vcf --whole_genome  --format vcf -q\n"
             .format( path2snpEFF , os.path.join(path2Input,infile) , os.path.join(outpath,outfile )))
+
+            #generate genmod
+            if genmod != "":
+                sbatch.write("genmod score -c {0} {1} > {1}.tmp\n".format(genmod, os.path.join(outpath,outfile ) ) );
+                sbatch.write("mv {0}.tmp {0}\n".format( os.path.join(outpath,outfile ) ) );
 
         sbatch.write("\n")
         sbatch.write("\n")

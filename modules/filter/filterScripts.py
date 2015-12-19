@@ -66,8 +66,9 @@ def build_DB(analysisTool,analysedProject,analysed,programDirectory,account):
             sbatch.write("\n")
             #generate genmod
             if genmod != "":
-                sbatch.write("genmod --score -c {0} {1} > {1}.tmp\n".format(genmod,FileName) );
-                sbatch.write("mv {0}.tmp {0}\n".format(FileName));
+                filePath=os.path.join(outpath,FileName)
+                sbatch.write("genmod --score -c {0} {1} > {1}.tmp\n".format(genmod,FilePath) );
+                sbatch.write("mv {0}.tmp {0}\n".format(FilePath);
                 
             analysed[analysisTool]["analysed"][sample]["outputFile"]=FileName;
             sbatch.write("\n")

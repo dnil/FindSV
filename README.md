@@ -25,20 +25,22 @@ First load python 2.7:
 module load python/2.7
 ```
 
-The first time a project is run, it neds to be added to the project.txt file. 
-This is a tab separated text file containing the path to the folder were the project folders are located, and the name of the project folder.
-The project name is assumed to be the same as the folder of the project. 
+Before a project can be analysed, it must beadded to the project.txt file. 
+This is a tab separated text file containing the path to the folder were the project folders are located, and the name of the project folder. Each project may consist of multiple folder, these are some examples
 The first line of the ```project.txt``` file is a header line that starts with #. Thus open the ```project.txt``` and add the following lines:
 
 ```
-Project1  /home/project/
+Project1  /home/project/Project1
 
-Project2  /home/project/
+Project2  /home/project/Project1
+
+Project3  path/to/folder1  path/to/folder2  path/to/foldern
 ```
 
 
 If these lines are present in the project.txt file, all samples located in the folders ```/home/project/Project1``` and
-```/home/project/Project2``` will be analysed by the pipeline
+```/home/project/Project2```, aswell as  ``` path/to/folder1  path/to/folder2  path/to/foldern ```
+will be analysed by the pipeline. 
 
 
 The pipeline is started using the following command:
@@ -145,8 +147,11 @@ processed=/home/jesper/files
 now the logs will be kept inside the ```/home/jesper/files``` directory. Processed may also be set to ```default```. Then the logs
 will be stored in the ```FindSV/analysis``` folder.
 
+-```uppmax=```
+Used to enable the uppmax module system(default)
 
-
+-```recursive=```
+If recursive is set to yes, FindSV will perform a recursive searh for bam files within the project folders(default)
 The reference file
 ===================
 The reference file contains paths leading to the references used by fermikit and CNVnator, the file(references.txt) is found in the FindSV directory and contains the following:

@@ -51,12 +51,14 @@ def initiateProcessFile(available_tools, processed):
 def detect_bam_files(project_path, projectToProcess,path_to_bam,recursive):
     bam_files=[];
     for project in project_path:
-        path_to_sample = os.path.join(project_path,path_to_bam)        
+        path_to_sample = os.path.join(project,path_to_bam)
+        tmp_bam_files=[]    
         if recursive:
-            bam_files += glob.glob( os.path.join(path_to_sample,"**","*.bam") )
+            tmp_bam_files += glob.glob( os.path.join(path_to_sample,"**","*.bam") )
         else:
-            bam_files += glob.glob( os.path.join(path_to_sample,"*.bam") )
-        
+            tmp_bam_files += glob.glob( os.path.join(path_to_sample,"*.bam") )
+        for sample in tmp_bam_files:
+        	bam_files.append( os.path.join(path_to_sample,sample) )	
     return(bam_files)
     
 def main(args):

@@ -54,6 +54,12 @@ def readConfigFile(programDirectory):
 					modules=True;
 				else:
 					modules=False;
+			if(option[0] == "recursive"):
+			    #do a recursive search for bam files within the project bam file folder
+			  	recursive = option[1].strip();
+				if(recursive == "yes"):
+					recursive=True;
+				else:  
 
 	#remove the excluded tools from the available tools list
 	available_tools=list(set(available_tools) - set(excluded_tools))
@@ -64,4 +70,4 @@ def readConfigFile(programDirectory):
 	for projects in excluded_projects:
 		exclude[projects]="";
 
-	return(working_dir,path_to_bam,available_tools,account,exclude,processed,modules)
+	return(working_dir,path_to_bam,available_tools,account,exclude,processed,modules,recursive)

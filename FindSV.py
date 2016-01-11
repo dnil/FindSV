@@ -47,30 +47,46 @@ def initiateProcessFile(available_tools, processed):
 
     return(processFiles)
 
-
+#this function searches the project folder for bam files and return the names of the files as a list of string
+def detect_bam_files(project_path, projectToProcess,path_to_bam,recursive):
+    bam_files=[];
+    for project in project_path:
+        path_to_sample = os.path.join(project_path,path_to_bam)        
+        if recursive:
+            bam_files += glob.glob( os.path.join(path_to_sample,"**","*.bam") )
+        else:
+            bam_files += glob.glob( os.path.join(path_to_sample,"*.bam") )
+        
+    return(bam_files)
+    
 def main(args):
     programDirectory = os.path.dirname(os.path.abspath(__file__))
     #read the project file
     projects = {}
     with open(os.path.join(programDirectory, "project.txt")) as ongoing_fd:
         for line in ongoing_fd:
-            if line[0] != "#":
-                info = line.split("\t")
-                projects[info[0].rstrip()] = info[1].rstrip()     
-
+            try:
+                if line[0] != "#":
+                    info=line.strip();
+                    info = line.split("\t")
+                    projects[info[0].rstrip()] = info[0:len(info)]     
+            except:
+                #the pipeline should not crash if the user adds some newlines etc to the project file
+                pass
+                
     if args.project:
-        projectToProcess = args.project
+        projectName = args.project
         tmpProject = {}
-        tmpProject[projectToProcess] = projects[projectToProcess]
+        tmpProject[projectName] = projects[projectName]
         projects = tmpProject  
     
     # Read the config file
     (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed,modules) = readConfigFile.readConfigFile(programDirectory)
+        processed,modules,recursive) = readConfigFile.readConfigFile(programDirectory)
 
     for project in projects:
-        analysis = projects[project]
-        projectToProcess = project
+        project_path = projects[project]
+        projectName = project
         processFilesPath = os.path.join(processed, project)
         #create a directory to keep track of the analysed files
         if not (os.path.exists(processFilesPath)):
@@ -79,10 +95,13 @@ def main(args):
         #initate the processFiles
         processFiles = initiateProcessFile(available_tools, processFilesPath)
 
+        #search for the projects bam files
+        bamfiles=detect_bam_files(project_path, projectName,path_to_bam,recursive)
+
         #function used to find variants
         processFiles,bamFilePaths = calling.variantCalling(
-            programDirectory, analysis, projectToProcess, working_dir, 
-            path_to_bam, available_tools, account, modules, exclude, processFiles,
+            programDirectory, project_path, projectName, working_dir, 
+            path_to_bam, available_tools, account, modules,bamfiles, exclude, processFiles,
             processFilesPath)
 
         #combine the results o the variant calling

@@ -49,7 +49,7 @@ def initiateProcessFile(available_tools, processed):
 
 #this function searches the project folder for bam files and return the names of the files as a list of string
 def detect_bam_files(project_path, projectToProcess,path_to_bam,recursive):
-    bam_files=[];
+    bam_files={};
     for project in project_path:
         path_to_sample = os.path.join(project,path_to_bam)
         tmp_bam_files=[]    
@@ -58,7 +58,9 @@ def detect_bam_files(project_path, projectToProcess,path_to_bam,recursive):
         else:
             tmp_bam_files += glob.glob( os.path.join(path_to_sample,"*.bam") )
         for sample in tmp_bam_files:
-        	bam_files.append( os.path.join(path_to_sample,sample) )	
+        	sample_name=sample.split("/")[-1]
+        	sample_path=os.path.join(path_to_sample,sample)
+        	bam_files[sample_name]={"folder":path_to_sample,"path":sample_path}
     return(bam_files)
     
 def main(args):

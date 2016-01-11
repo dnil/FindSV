@@ -13,9 +13,8 @@ def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_t
         if not os.path.isdir(local_project_dir):
             os.makedirs(local_project_dir)
         for tools in available_tools:
-            path_to_sample = os.path.join(analysis, path_to_bam)
             print(tools);
-            for file in bam_files:
+            for sample_name in bam_files:
                 if sample_name in processFiles[tools]["analysed"].keys():
                     # sample state is ANALYSED
                     print "sample {0} ANALYSED".format(sample_name)
@@ -35,7 +34,7 @@ def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_t
                 else:
                     # sample state is NEW
                     # submit this sample, if submission works fine store it in under analysis with the PID 
-                    call="scripts." + tools+"(\""+programDirectory+"\",\""+local_project_dir+"/"+tools+"\",\""+sample_name+"\",\""+os.path.join(path_to_sample, file)+"\",\""+account+"\",\""+str(modules)+"\")"
+                    call="scripts." + tools+"(\""+programDirectory+"\",\""+local_project_dir+"/"+tools+"\",\""+sample_name+"\",\""+bam_files[sample]["path"]+"\",\""+account+"\",\""+str(modules)+"\")"
                     callerOutput = eval(call)
                     processFiles[tools]["ongoing"][sample_name] = {"pid":callerOutput[0],"project":project_name,"outpath": local_project_dir,"outputFile":callerOutput[1]}
                     print "sample {0} LAUNCHED".format(sample_name)

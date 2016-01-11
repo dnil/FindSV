@@ -60,7 +60,7 @@ def readConfigFile(programDirectory):
 				if(recursive == "yes"):
 					recursive=True;
 				else:  
-
+					recursive=False
 	#remove the excluded tools from the available tools list
 	available_tools=list(set(available_tools) - set(excluded_tools))
 

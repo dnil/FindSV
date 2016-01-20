@@ -1,5 +1,4 @@
-
-import sys, os, glob, argparse, shutil
+import sys, os, glob, argparse, shutil,fnmatch
 sys.path.append("modules")
 import readConfigFile, calling, filter, annotation, database,combine,cleaning,process
 import time
@@ -51,15 +50,18 @@ def initiateProcessFile(available_tools, processed):
 def detect_bam_files(project_path, projectToProcess,path_to_bam,recursive):
     bam_files={};
     for project in project_path:
-        path_to_sample = os.path.join(project,path_to_bam)
+        path_to_sample = os.path.join(project.strip(),path_to_bam.strip())
         tmp_bam_files=[]    
         if recursive:
-            tmp_bam_files += glob.glob( os.path.join(path_to_sample,"**","*.bam") )
-        else:
+            for root, dirnames, filenames in os.walk(path_to_sample):
+                for filename in fnmatch.filter(filenames, '*.bam'):
+                    tmp_bam_files.append(os.path.join(root, filename))
+        else: 
             tmp_bam_files += glob.glob( os.path.join(path_to_sample,"*.bam") )
         for sample in tmp_bam_files:
-        	sample_name=sample.split("/")[-1]
-        	sample_path=os.path.join(path_to_sample,sample)
+        	sample_path=sample
+                sample_name=sample.split(".")[0]
+                sample_name=sample_name.split("/")[-1]
         	bam_files[sample_name]={"folder":path_to_sample,"path":sample_path}
     return(bam_files)
     
@@ -73,7 +75,7 @@ def main(args):
                 if line[0] != "#":
                     info=line.strip();
                     info = line.split("\t")
-                    projects[info[0].rstrip()] = info[0:len(info)]     
+                    projects[info[0].rstrip()] = info[1:len(info)]     
             except:
                 #the pipeline should not crash if the user adds some newlines etc to the project file
                 pass

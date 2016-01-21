@@ -6,7 +6,7 @@ import combineScript
 
 
 #function used to annotate the filtered variants
-def combine(programDirectory,previousProcessFiles,processed,account,bamFilePaths):
+def combine(programDirectory,previousProcessFiles,processed,account,bam_files):
        
         #read the process files
         processFiles=common.readProcessFiles(["FindSV"],processed,"combine")
@@ -48,7 +48,7 @@ def combine(programDirectory,previousProcessFiles,processed,account,bamFilePaths
                     for tools in previousProcessFiles:
                         tool = tools
                         combinedProcessFile.update({tools:previousProcessFiles[tools]["analysed"][sample]})
-                    outgoing=combineScript.submit4combination(tool,sample,combinedProcessFile,programDirectory,account,bamFilePaths[sample]);
+                    outgoing=combineScript.submit4combination(tool,sample,combinedProcessFile,programDirectory,account,bam_files[sample_name]["path"]);
                     processFiles["FindSV"]["ongoing"].update(outgoing)
        
         common.UpdateProcessFiles(processFiles,processed,"combine")  

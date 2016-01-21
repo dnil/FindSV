@@ -7,7 +7,6 @@ import scripts,common
 #function used to find variants
 def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,modules,bam_files,exclude,processFiles,processed):
     project_name=projectToProcess
-    bamFilePath={}
     if not project_name.startswith('.') and project_name not in exclude.keys():
         local_project_dir = os.path.join(working_dir, project_name)
         if not os.path.isdir(local_project_dir):
@@ -40,4 +39,4 @@ def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_t
                     print "sample {0} LAUNCHED".format(sample_name)
 
         common.UpdateProcessFiles(processFiles,processed,"calling")
-        return(processFiles,bamFilePath);
+        return(processFiles);

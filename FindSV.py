@@ -105,14 +105,14 @@ def main(args):
         bamfiles=detect_bam_files(project_path, projectName,path_to_bam,recursive)
 
         #function used to find variants
-        processFiles,bamFilePaths = calling.variantCalling(
+        processFiles= calling.variantCalling(
             programDirectory, project_path, projectName, working_dir, 
             path_to_bam, available_tools, account, modules,bamfiles, exclude, processFiles,
             processFilesPath)
 
         #combine the results o the variant calling
         processFiles = combine.combine(programDirectory, processFiles, 
-                                             processFilesPath, account,bamFilePaths)
+                                             processFilesPath, account,bamfiles)
 
         #a function used to build databases from vcf files
         processFiles = database.buildDatabase(programDirectory, processFiles,

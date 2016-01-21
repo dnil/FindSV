@@ -47,7 +47,7 @@ def buildDatabase(programDirectory,previousProcessFiles,processed,account):
         if newsamples[tools]:
             step={}
             step["filter"]=True
-            process.restart(programDirectory,step,project,"all")
+            process.restart(programDirectory,step,project,None)
 
     common.UpdateProcessFiles(processFiles,processed,"database")
 

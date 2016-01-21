@@ -48,7 +48,7 @@ def combine(programDirectory,previousProcessFiles,processed,account,bam_files):
                     for tools in previousProcessFiles:
                         tool = tools
                         combinedProcessFile.update({tools:previousProcessFiles[tools]["analysed"][sample]})
-                    outgoing=combineScript.submit4combination(tool,sample,combinedProcessFile,programDirectory,account,bam_files[sample_name]["path"]);
+                    outgoing=combineScript.submit4combination(tool,sample,combinedProcessFile,programDirectory,account,bam_files[sample]["path"]);
                     processFiles["FindSV"]["ongoing"].update(outgoing)
        
         common.UpdateProcessFiles(processFiles,processed,"combine")  

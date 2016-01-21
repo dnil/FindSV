@@ -5,7 +5,7 @@ import readConfigFile
 
 def restart(programDirectory,step,project,status):
     (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed,modules) = readConfigFile.readConfigFile(programDirectory)
+        processed,modules,recursive)  = readConfigFile.readConfigFile(programDirectory)
     statusFiles = ["timeout", "failed", "cancelled"]
     processes = {"caller":["annotation", "filter", "database","combine","cleaning"],
                  "combine":["annotation", "filter", "database","combine","cleaning"],

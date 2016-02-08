@@ -1,9 +1,7 @@
 working_directory=default
-bamfile_location=
 available_tools=CNVnator;FindTranslocations;fermiKit;Delly
 excluded_tools=Delly;fermiKit
-account=b2015313
-excluded_projects=P1366_fail;P1366_new;P1366_node;P1366_old;P1426_previous;P1553_old_run;P1775_old_plu;P1775_test
+account=
 processed=default
 uppmax=yes
 recursive=yes

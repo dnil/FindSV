@@ -2,6 +2,5 @@ working_directory=default
 available_tools=CNVnator;FindTranslocations;fermiKit;Delly
 excluded_tools=Delly;fermiKit
 account=
-processed=default
 uppmax=yes
 recursive=yes

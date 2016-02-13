@@ -39,13 +39,6 @@ def readConfigFile(programDirectory):
 					excluded_projects=excluded_projects.split(";");
 				else:
 					excluded_projects=[];
-			if(option[0]=="processed"):
-				#get the processed file directory
-				processed = option[1]
-				#if the processed folder is set to default, it will be placed in the program filder
-				if(processed == "default"):
-					processed=os.path.join(programDirectory,"analysed");
-
 			if(option[0]=="uppmax"):
 				# use module system etc on a machine 
 				# similar to UPPMAX standard layout
@@ -67,7 +60,5 @@ def readConfigFile(programDirectory):
     
 	#add the excluded projects to a dictionary
 	exclude={};
-	for projects in excluded_projects:
-		exclude[projects]="";
 
-	return(working_dir,path_to_bam,available_tools,account,exclude,processed,modules,recursive)
+	return(working_dir,available_tools,account,exclude,modules,recursive)

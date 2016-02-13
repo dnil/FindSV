@@ -87,13 +87,12 @@ def main(args):
         projects = tmpProject  
     
     # Read the config file
-    (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed,modules,recursive) = readConfigFile.readConfigFile(programDirectory)
-
+    (working_dir, available_tools, account, exclude,modules,recursive) = readConfigFile.readConfigFile(programDirectory)
+    path_to_bam=""
     for project in projects:
         project_path = projects[project]
         projectName = project
-        processFilesPath = os.path.join(processed, project)
+        processFilesPath = os.path.join(working_dir, project,"process")
         #create a directory to keep track of the analysed files
         if not (os.path.exists(processFilesPath)):
             os.makedirs(processFilesPath)

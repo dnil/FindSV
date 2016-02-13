@@ -5,7 +5,16 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
     samplePath=os.path.join(analysed[tools]["analysed"][sample]["outpath"],tools)
-    path2snpEFF = os.path.join(programDirectory,"programFiles","ensembl-tools-release-81","scripts","variant_effect_predictor","variant_effect_predictor.pl");
+    path_dict={}
+    with open(os.path.join(programDirectory,"path.txt")) as path_file:
+        for line in path_file:
+            if not line.startswith("#") and not line == "\n":
+                content=line.strip().split("=")
+                path_dict[content[0]]=content[1]
+    if not path_dict["vep"]:
+        path2snpEFF = os.path.join(programDirectory,"programFiles","ensembl-tools-release-81","scripts","variant_effect_predictor","variant_effect_predictor.pl");
+    else:
+        path2snpEFF=path_dict["vep"]
     reference="GRCh37.75";
 
     outpath=os.path.join(samplePath,"annotation");
@@ -46,7 +55,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
             outfile=prefix+outsufix;
 
             FileName.append(outfile)
-            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 5 --port 3337 --vcf --whole_genome  --format vcf -q\n"
+            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 5 --port 3337 --vcf --whole_genome --per_gene --format vcf -q\n"
             .format( path2snpEFF , os.path.join(path2Input,infile) , os.path.join(outpath,outfile )))
 
             #generate genmod

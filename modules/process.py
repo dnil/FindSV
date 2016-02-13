@@ -4,8 +4,7 @@ sys.path.append("modules")
 import readConfigFile
 
 def restart(programDirectory,step,project,status):
-    (working_dir, path_to_bam, available_tools, account, exclude, 
-        processed,modules,recursive)  = readConfigFile.readConfigFile(programDirectory)
+    (working_dir,available_tools, account, exclude, modules,recursive)  = readConfigFile.readConfigFile(programDirectory)
     statusFiles = ["timeout", "failed", "cancelled"]
     processes = {"caller":["annotation", "filter", "database","combine","cleaning"],
                  "combine":["annotation", "filter", "database","combine","cleaning"],
@@ -53,7 +52,7 @@ def restart(programDirectory,step,project,status):
     #restart the callers by removing the status files
     for project in projects:
         for caller in callerToBeRestarted:
-            deletedProcess = os.path.join(processed, project, caller)
+            deletedProcess = os.path.join(working_dir, project,"process", caller)
             if(os.path.exists(deletedProcess) and not restartStatusFiles):
                 shutil.rmtree(deletedProcess)
             #if a certain statusfile is specified, restart only that file
@@ -82,7 +81,7 @@ def restart(programDirectory,step,project,status):
         print(project)
         for process in processToBeRestarted:
             print(process)
-            deletedProcess = os.path.join(processed, project, "FindSV", process)
+            deletedProcess = os.path.join(working_dir, project,"process", "FindSV", process)
             # If the entire step is to be restarted, 
             # delete the folder containing the status files.
             if(os.path.exists(deletedProcess) and not restartStatusFiles):

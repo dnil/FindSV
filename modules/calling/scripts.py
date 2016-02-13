@@ -33,6 +33,21 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
 
+    #samplePath=os.path.join(analysed[tools]["analysed"][sample]["outpath"],tools)
+    path_dict={}
+    with open(os.path.join(programDirectory,"path.txt")) as path_file:
+        for line in path_file:
+            if not line.startswith("#") and not line == "\n":
+                content=line.strip().split("=")
+                path_dict[content[0]]=content[1]
+    cnvnator_path="cnvnator"
+    cnvnator2vcf_path="cnvnator2VCF.pl"
+    if path_dict["CNVnator"]:
+        cnvnator_path=path_dict["CNVnator"]
+    if path_dict["cnvnator2VCF"]:
+        cnvnator2vcf_path=path_dict["cnvnator2VCF"]
+    
+
     #path to the folder were the reference chromosomes are stored
     sbatch_dir,out_dir,err_dir=common.createFolder(local_dir);
     chrFolder=references(programDirectory,"chromosomes");
@@ -75,12 +90,12 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
 	sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bam_file, sample_name))
 	#sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
        	
-        sbatch.write("cnvnator -root {0}.root -tree $SNIC_TMP/{1}/{2} \n".format(output_header,sample_name, os.path.split(bam_file)[1]) );
-        sbatch.write("cnvnator -root {0}.root -his 1000 -d {1}\n".format(output_header,chrFolder));
-        sbatch.write("cnvnator -root {0}.root -stat 1000 >> {1}.cnvnator.log \n".format(output_header,output_header));
-        sbatch.write("cnvnator -root {0}.root -partition 1000 \n".format(output_header))
-        sbatch.write("cnvnator -root {0}.root -call 1000 > {1}.cnvnator.out \n".format(output_header,output_header));
-        sbatch.write("cnvnator2VCF.pl {0}.cnvnator.out  >  {1}.vcf \n".format(output_header,output_header));
+        sbatch.write("{0} -root {1}.root -tree $SNIC_TMP/{2}/{3} \n".format(cnvnator_path,output_header,sample_name, os.path.split(bam_file)[1]) );
+        sbatch.write("{0} -root {1}.root -his 1000 -d {2}\n".format(cnvnator_path,output_header,chrFolder));
+        sbatch.write("{0} -root {1}.root -stat 1000 >> {2}.cnvnator.log \n".format(cnvnator_path,output_header,output_header));
+        sbatch.write("{0} -root {1}.root -partition 1000 \n".format(cnvnator_path,output_header))
+        sbatch.write("{0} -root {1}.root -call 1000 > {2}.cnvnator.out \n".format(cnvnator_path,output_header,output_header));
+        sbatch.write("{0} {1}.cnvnator.out  >  {2}.vcf \n".format(cnvnator2vcf_path,output_header,output_header));
         sbatch.write("rm {0}.root\n".format(output_header));
         sbatch.write("\n")
         sbatch.write("\n")
@@ -98,6 +113,17 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
     if not (os.path.isfile(bai_file)):
         bai_file=bam_file+".bai";
 
+    path_dict={}
+    with open(os.path.join(programDirectory,"path.txt")) as path_file:
+        for line in path_file:
+            if not line.startswith("#") and not line == "\n":
+                content=line.strip().split("=")
+                print content
+                path_dict[content[0]]=content[1]
+    FT_path="{0}/programFiles/FindTranslocations/bin/FindTranslocations".format(programDirectory)
+    if path_dict["FindTranslocations"]:
+        FT_path=path_dict["FindTranslocations"]
+
 
 
     with open(os.path.join(sbatch_dir, "{}.slurm".format(sample_name)), 'w') as sbatch:
@@ -112,29 +138,21 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
 
         sbatch.write("\n");
         sbatch.write("\n");
-
-	# If we are on a machine with the SNIC modules installed
-	if(modules == "True"):
-		sbatch.write("module load bioinfo-tools\n")
-		sbatch.write("module load bwa\n")
-		sbatch.write("module load samtools\n")
-
-        sbatch.write("FINDTRANS={}/programFiles/FindTranslocations/bin/FindTranslocations\n".format(programDirectory))
-
+        
+        sbatch.write("FINDTRANS={0}".format(FT_path))
         sbatch.write("\n")
         sbatch.write("\n")
 
-	# If we are on a non-SNIC system, chances are there is no 
-	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
-	# to /tmp. 
-	sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
+    	# If we are on a non-SNIC system, chances are there is no 
+    	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
+    	# to /tmp. 
+        sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
 
 
         #now tranfer the bam file   
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
-
-	sbatch.write("if [[ -z {} ]] ; then samtools index {} ; fi\n".format(bai_file, bam_file))
+        sbatch.write("if [[ -z {} ]] ; then samtools index {} ; fi\n".format(bai_file, bam_file))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
 
         sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 6 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))

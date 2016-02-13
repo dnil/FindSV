@@ -33,7 +33,7 @@ pip install genmod
 # unzip CNVnator_v0.3.zip
 #cd CNVnator_v0.3
 #wget https://root.cern.ch/download/root_v5.34.34.Linux-slc6-x86_64-gcc4.4.tar.gz
-#tar zcf root_v5.34.34.Linux-slc6-x86_64-gcc4.4.tar.gz
+#tar xvf root_v5.34.34.Linux-slc6-x86_64-gcc4.4.tar.gz
 #cd root
 #export ROOTSYS=`pwd`
 #export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ROOTSYS}/lib

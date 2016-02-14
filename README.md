@@ -170,3 +170,13 @@ chrN.fa
 ```
 
 ```bwa-indexed-ref``` is used by fermikit, it should contain the path to a bwa inexed reference file.
+The path file
+===================
+The path file contains the path to cnvnator, FindTranslocations and vep. If no path is added, FindSV will try the default uppmax configuration. Example:
+
+```
+FindTranslocations=/home/jesperei/FindTranslocations/bin/FindTranslocations
+CNVnator=
+cnvnator2VCF=
+vep=/home/jesperei/FindSV/programFiles/ensembl-tools-release-81/scripts/variant_effect_predictor/variant_effect_predictor.pl
+```

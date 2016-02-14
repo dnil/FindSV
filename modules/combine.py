@@ -1,13 +1,9 @@
 import sys, os, glob, time
-sys.path.append("modules/combine")
-import common
-import combineScript
-
-
 
 #function used to annotate the filtered variants
 def combine(programDirectory,previousProcessFiles,processed,account,bam_files):
-       
+        sys.path.append(os.path.join(programDirectory,"modules/combine"))
+        import common,combineScript
         #read the process files
         processFiles=common.readProcessFiles(["FindSV"],processed,"combine")
         samplesToMerge={};

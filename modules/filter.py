@@ -1,12 +1,9 @@
 import sys, os, glob, time
-sys.path.append("filter")
-sys.path.append("modules")
-sys.path.append("modules/filter")
-import common
-import filterScripts
 
 #function used to apply filters on the varian call files.
 def applyFilter(programDirectory,previousProcessFiles,processed,account):
+    sys.path.append(os.path.join(programDirectory,"modules/filter"))
+    import common,filterScripts
     print("applying filter");
     processFiles=common.readProcessFiles(previousProcessFiles,processed,"filter")
         

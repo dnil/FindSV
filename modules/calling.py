@@ -1,11 +1,10 @@
 import sys, os, glob
-sys.path.append("modules/calling")
-sys.path.append("modules")
-sys.path.append("calling")
-import scripts,common
+
 
 #function used to find variants
 def variantCalling(programDirectory,analysis,projectToProcess,working_dir,path_to_bam,available_tools,account,modules,bam_files,exclude,processFiles,processed):
+    sys.path.append(os.path.join(programDirectory,"modules/calling"))
+    import scripts,common
     project_name=projectToProcess
     if not project_name.startswith('.') and project_name not in exclude.keys():
         local_project_dir = os.path.join(working_dir, project_name)

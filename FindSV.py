@@ -1,5 +1,5 @@
 import sys, os, glob, argparse, shutil,fnmatch
-sys.path.append("modules")
+sys.path.append(os.path.join(sys.argv[0].replace("FindSV.py",""),"modules"))
 import readConfigFile, calling, filter, annotation, database,combine,cleaning,process
 import time
 

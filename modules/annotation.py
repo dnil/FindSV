@@ -1,11 +1,10 @@
 import sys, os, glob, time
-sys.path.append("modules/annotation")
-import common
-import annotationScript
+
 
 #function used to annotate the filtered variants
 def annotation(programDirectory,previousProcessFiles,processed,account):
-       
+        sys.path.append(os.path.join(programDirectory,"modules/annotation"))
+        import common,annotationScript
         #read the process files
         processFiles=common.readProcessFiles(previousProcessFiles,processed,"annotation")
         for tools in previousProcessFiles: 

@@ -1,11 +1,9 @@
 import sys, os, glob, time
-sys.path.append("modules/cleaning")
-import common
-import cleaningScript
 
 #function used to annotate the filtered variants
 def cleaning(programDirectory,previousProcessFiles,processed,account):
-       
+        sys.path.append(os.path.join(programDirectory,"modules/cleaning"))
+        import cleaningScript,common
         #read the process files
         processFiles=common.readProcessFiles(previousProcessFiles,processed,"cleaning")
         for tools in previousProcessFiles: 

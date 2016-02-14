@@ -1,11 +1,8 @@
 import os,sys
-sys.path.append("modules/database")
-sys.path.append("modules")
-sys.path.append("")
-import submitToDatabase,common,time,process
-
 
 def buildDatabase(programDirectory,previousProcessFiles,processed,account):
+    sys.path.append(os.path.join(programDirectory,"modules/database"))
+    import submitToDatabase,common,time,process
     print("constructing databases");
     processFiles=common.readProcessFiles(previousProcessFiles,processed,"database")
 

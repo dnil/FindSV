@@ -18,7 +18,8 @@ def restart(programDirectory,step,project,status):
         for line in ongoing_fd:
             if line[0] != "#":
                 info = line.split("\t")
-                projects[info[0].rstrip()] = info[1].rstrip()     
+                if len(info) >= 2:
+                    projects[info[0].rstrip()] = info[1].rstrip()     
 
     #check if any project i selected
     if project:

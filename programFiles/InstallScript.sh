@@ -27,17 +27,17 @@ perl INSTALL.pl --AUTO ac --s homo_sapiens --ASSEMBLY GRCh37
 #install genmod
 pip install genmod
 
-#install CNVnator
+#install CNVnator, the ROOTSYS path must be permanently added to path, otherwise cnvnator will not run
 
-# wget http://sv.gersteinlab.org/cnvnator/CNVnator_v0.3.zip
-# unzip CNVnator_v0.3.zip
-#cd CNVnator_v0.3
-#wget https://root.cern.ch/download/root_v5.34.34.Linux-slc6-x86_64-gcc4.4.tar.gz
-#tar xvf root_v5.34.34.Linux-slc6-x86_64-gcc4.4.tar.gz
+#git clone http://root.cern.ch/git/root.git
 #cd root
-#export ROOTSYS=`pwd`
-#export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ROOTSYS}/lib
-#cd ../src/samtools/
+#./configure
+#make
+#source bin/thisroot.sh
+#cd ..
+#wget https://github.com/abyzovlab/CNVnator/releases/download/v0.3.2/CNVnator_v0.3.2.zip
+#unzip CNVnator_v0.3.2.zip
+#cd CNVnator_v0.3.2/src/samtools/
 #make
 #cd ..
 #make

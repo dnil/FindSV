@@ -28,6 +28,10 @@ perl INSTALL.pl --AUTO ac --s homo_sapiens --ASSEMBLY GRCh37
 pip install genmod
 
 #install CNVnator, the ROOTSYS path must be permanently added to path, otherwise cnvnator will not run
+#how to add rootsys
+#export ROOTSYS=/path/to/root/
+#then add the pat to root library
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTSYS/lib
 
 #git clone http://root.cern.ch/git/root.git
 #cd root

@@ -69,26 +69,29 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
         sbatch.write("\n");
         sbatch.write("\n");
 
-	# If we are on a machine with the SNIC modules installed
-	if(modules == "True"):
-		sbatch.write("module load bioinfo-tools\n")
-		sbatch.write("module load bwa\n")
-		sbatch.write("module load samtools\n")
-		sbatch.write("module load CNVnator\n")
+        # If we are on a machine with the SNIC modules installed
+        if(modules == "True"):
+            sbatch.write("module load bioinfo-tools\n")
+            sbatch.write("module load bwa\n")
+            sbatch.write("module load samtools\n")
+            sbatch.write("module load CNVnator\n")
 
-		sbatch.write("\n")
-		sbatch.write("\n")
-	
-	# If we are on a non-SNIC system, chances are there is no 
-	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
-	# to /tmp. 
-	sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
+        sbatch.write("\n")
+        sbatch.write("\n")
+        if (path_dict["ROOTSYS"]):
+            sbatch.write("export ROOTSYS= {}\n".format(path_dict["ROOTSYS"]))
+            sbatch.write("export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTSYS/lib\n")
+               
+	    # If we are on a non-SNIC system, chances are there is no 
+        # SNIC_TMP var set. TMP_DIR is more universal, or fall back
+        # to /tmp. 
+        sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
 
         # now transfer the bam file
 
-	sbatch.write("mkdir -p $SNIC_TMP/{0}\n".format(sample_name))
-	sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bam_file, sample_name))
-	#sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
+        sbatch.write("mkdir -p $SNIC_TMP/{0}\n".format(sample_name))
+        sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bam_file, sample_name))
+        #sbatch.write("rsync -rptoDLv {0} $SNIC_TMP/{1}\n".format(bai_file, sample_name))
        	
         sbatch.write("{0} -root {1}.root -tree $SNIC_TMP/{2}/{3} \n".format(cnvnator_path,output_header,sample_name, os.path.split(bam_file)[1]) );
         sbatch.write("{0} -root {1}.root -his 1000 -d {2}\n".format(cnvnator_path,output_header,chrFolder));
@@ -97,6 +100,7 @@ def CNVnator(programDirectory,local_dir, sample_name, bam_file,account,modules):
         sbatch.write("{0} -root {1}.root -call 1000 > {2}.cnvnator.out \n".format(cnvnator_path,output_header,output_header));
         sbatch.write("{0} {1}.cnvnator.out  >  {2}.vcf \n".format(cnvnator2vcf_path,output_header,output_header));
         sbatch.write("rm {0}.root\n".format(output_header));
+        sbatch.write("rm $SNIC_TMP/{0}/*".format(sample_name));
         sbatch.write("\n")
         sbatch.write("\n")
 
@@ -155,8 +159,9 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
         sbatch.write("if [[ -z {} ]] ; then samtools index {} ; fi\n".format(bai_file, bam_file))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bai_file, sample_name))
 
-        sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 6 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
+        sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 4 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
         sbatch.write("rm {0}.tab\n".format(output_header))
+        sbatch.write("rm $SNIC_TMP/{0}/*".format(sample_name);
         sbatch.write("\n")
         sbatch.write("\n")
 
@@ -194,10 +199,10 @@ def fermiKit(programDirectory,local_dir, sample_name, bam_file,account,modules):
 
         #now transfer the bam file   
 
-	# If we are on a non-SNIC system, chances are there is no 
-	# SNIC_TMP var set. TMP_DIR is more universal, or fall back
-	# to /tmp. 
-	sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
+        # If we are on a non-SNIC system, chances are there is no 
+	    # SNIC_TMP var set. TMP_DIR is more universal, or fall back
+        # to /tmp. 
+        sbatch.write("if [[ -z $SNIC_TMP ]] ; then if [[ -z $TMPDIR ]] ; then SNIC_TMP=/tmp ; else SNIC_TMP=$TMPDIR ; fi ; fi\n")
 
         sbatch.write("mkdir -p $SNIC_TMP/{}\n".format(sample_name))
         sbatch.write("rsync -rptoDLv {} $SNIC_TMP/{}\n".format(bam_file, sample_name))
@@ -237,12 +242,12 @@ def Delly(programDirectory,local_dir, sample_name, bam_file,account,modules):
         sbatch.write("\n");
         sbatch.write("\n");
 
-	if(modules == "True"):
-		sbatch.write("module load bioinfo-tools\n")
-		sbatch.write("module load delly\n")
+        if(modules == "True"):
+    	    sbatch.write("module load bioinfo-tools\n")
+    	    sbatch.write("module load delly\n")
 
-		sbatch.write("\n")
-		sbatch.write("\n")
+        sbatch.write("\n")
+        sbatch.write("\n")
 
         # now transfer the bam file   
 

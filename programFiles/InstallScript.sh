@@ -32,6 +32,8 @@ pip install genmod
 #export ROOTSYS=/path/to/root/
 #then add the pat to root library
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTSYS/lib
+#ROOTSYS could also be added via the ROOTSYS variable in the path script
+#then set rootsys=/path/to/root/
 
 #git clone http://root.cern.ch/git/root.git
 #cd root

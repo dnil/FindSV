@@ -1,5 +1,6 @@
 #file giving the path to the various tools of the pipeline, if no path is added, default will be used, that will work fine on uppmax
 FindTranslocations=
 CNVnator=
+ROOTSYS=
 cnvnator2VCF=
 vep=

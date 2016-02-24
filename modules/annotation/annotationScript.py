@@ -16,7 +16,10 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
     else:
         path2snpEFF=path_dict["vep"]
     reference="GRCh37.75";
-
+    cache_dir=""
+    if path_dict["vep_dir"]:
+        cache_dir ="--dir " + path_dict["vep_dir"] + " "
+        
     outpath=os.path.join(samplePath,"annotation");
     sbatch_dir,out_dir,err_dir=common.createFolder(outpath);
 
@@ -55,8 +58,8 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
             outfile=prefix+outsufix;
 
             FileName.append(outfile)
-            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 5 --port 3337 --vcf --whole_genome --per_gene --format vcf -q\n"
-            .format( path2snpEFF , os.path.join(path2Input,infile) , os.path.join(outpath,outfile )))
+            sbatch.write("perl {0} --cache --force_overwrite --poly b -i {1} -o {2} --buffer_size 5 --port 3337 --vcf --whole_genome --per_gene --format vcf  {3} -q\n"
+            .format( path2snpEFF , os.path.join(path2Input,infile) , os.path.join(outpath,outfile ), cache_dir))
 
             #generate genmod
             if genmod != "":

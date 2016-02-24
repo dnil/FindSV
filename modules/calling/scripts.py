@@ -161,7 +161,7 @@ def FindTranslocations(programDirectory,local_dir, sample_name, bam_file,account
 
         sbatch.write('$FINDTRANS --sv  --bam $SNIC_TMP/{}/{} --bai $SNIC_TMP/{}/{} --auto --minimum-supporting-pairs 4 --output {}\n'.format(sample_name, os.path.split(bam_file)[1], sample_name, os.path.split(bai_file)[1], output_header))
         sbatch.write("rm {0}.tab\n".format(output_header))
-        sbatch.write("rm $SNIC_TMP/{0}/*".format(sample_name);
+        sbatch.write("rm $SNIC_TMP/{0}/*".format(sample_name));
         sbatch.write("\n")
         sbatch.write("\n")
 

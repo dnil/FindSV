@@ -4,3 +4,4 @@ CNVnator=
 ROOTSYS=
 cnvnator2VCF=
 vep=
+vep_dir=

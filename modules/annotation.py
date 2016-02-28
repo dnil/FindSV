@@ -2,7 +2,7 @@ import sys, os, glob, time
 
 
 #function used to annotate the filtered variants
-def annotation(programDirectory,previousProcessFiles,processed,account):
+def annotation(programDirectory,previousProcessFiles,processed,account,genmod_file):
         sys.path.append(os.path.join(programDirectory,"modules/annotation"))
         import common,annotationScript
         #read the process files
@@ -26,7 +26,7 @@ def annotation(programDirectory,previousProcessFiles,processed,account):
                 else:
                     print("submitting: " + sample);
                     try:
-                        outgoing=annotationScript.submit2Annotation(tools,sample,previousProcessFiles,programDirectory,account);
+                        outgoing=annotationScript.submit2Annotation(tools,sample,previousProcessFiles,programDirectory,account,genmod_file);
                         processFiles[tools]["ongoing"].update(outgoing)
                     except:
                         print("FAILED:was the sample excluded?");         

@@ -1,7 +1,7 @@
 import sys, os, glob, time
 
 #function used to apply filters on the varian call files.
-def applyFilter(programDirectory,previousProcessFiles,processed,account):
+def applyFilter(programDirectory,previousProcessFiles,processed,account,frequency_db):
     sys.path.append(os.path.join(programDirectory,"modules/filter"))
     import common,filterScripts
     print("applying filter");
@@ -17,7 +17,7 @@ def applyFilter(programDirectory,previousProcessFiles,processed,account):
         #only run the query when the previous query was finished and when there are newly generated databases
         #WARNING, if the user removes samples from the database log file, the condition will always be true,TODO: change to set comparison
         if(processFiles[tool]["ongoing"] == {} and sorted(filtered) != sorted(database) ):
-            add2Ongoing=filterScripts.runScripts(tool,previousProcessFiles[tool]["analysed"].keys(),previousProcessFiles,programDirectory,account);
+            add2Ongoing=filterScripts.runScripts(tool,previousProcessFiles[tool]["analysed"].keys(),previousProcessFiles,programDirectory,account,frequency_db);
             processFiles[tool]["ongoing"].update(add2Ongoing);
                                                         
         samples=[]

@@ -11,22 +11,42 @@ def restart(programDirectory,step,project,status):
                  "db":["annotation", "filter", "database","cleaning"], 
                  "filter":["annotation", "filter","cleaning"], 
                  "annotation":["annotation","cleaning"]}
-
+    default_working_dir=working_dir
     print("Restarting:")
     projects = {}
-    with open(os.path.join(programDirectory, "project.txt")) as ongoing_fd:
-        for line in ongoing_fd:
-            if line[0] != "#":
-                info = line.split("\t")
-                if len(info) >= 2:
-                    projects[info[0].rstrip()] = info[1].rstrip()     
-
-    #check if any project i selected
     if project:
-        projectToProcess  =  project
-        tmpProject = {}
-        tmpProject[projectToProcess] = projects[projectToProcess]
-        projects = tmpProject
+        #the user has selected a project manually
+        with open(args.project) as ongoing_fd:
+            projectID=file.split("/")[-1]
+            projectID=file.replace(".txt","")
+            projects[projectID]={};
+            for line in ongoing_fd:
+                try:
+                    if line[0] != "#":
+                        info=line.strip();
+                        info = info.split("\t")
+                        projects[projectID][info[0]]=info[1:]   
+                except:
+                    #the pipeline should not crash if the user adds some newlines etc to the project file
+                    pass 
+    else:  
+        #all projects found in the project dictionary are being analysed
+        for file in os.listdir(os.path.join(programDirectory,"projects")):
+            if file.endswith(".txt") and not file.endswith("example.txt"):
+                with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
+                    projectID=file.split("/")[-1]
+                    projectID=file.replace(".txt","")
+                    projects[projectID]={};
+                    for line in ongoing_fd:
+                        try:
+                            if line[0] != "#":
+                                info=line.strip();
+                                info = info.split("\t")
+                                projects[projectID][info[0]]=info[1:]
+                        except:
+                        #the pipeline should not crash if the user adds some newlines etc to the project file
+                            pass  
+
 
     #check if any status file is selected
     restartStatusFiles = []
@@ -52,6 +72,11 @@ def restart(programDirectory,step,project,status):
 
     #restart the callers by removing the status files
     for project in projects:
+        if not projects[project]["output"]:
+            working_dir = default_working_dir
+        else:
+            working_dir= projects[project]["output"][0]
+            
         for caller in callerToBeRestarted:
             deletedProcess = os.path.join(working_dir, project,"process", caller)
             if(os.path.exists(deletedProcess) and not restartStatusFiles):
@@ -78,7 +103,11 @@ def restart(programDirectory,step,project,status):
         processToBeRestarted = processes["annotation"]
 
     # Iterate through each project
-    for project in projects:  
+    for project in projects:
+        if not projects[project]["output"]:
+            working_dir = default_working_dir
+        else:
+            working_dir= projects[project]["output"][0] 
         print(project)
         for process in processToBeRestarted:
             print(process)

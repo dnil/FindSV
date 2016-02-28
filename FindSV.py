@@ -69,30 +69,63 @@ def main(args):
     programDirectory = os.path.dirname(os.path.abspath(__file__))
     #read the project file
     projects = {}
-    with open(os.path.join(programDirectory, "project.txt")) as ongoing_fd:
-        for line in ongoing_fd:
-            try:
-                if line[0] != "#":
-                    info=line.strip();
-                    info = line.split("\t")
-                    projects[info[0].rstrip()] = info[1:len(info)]     
-            except:
-                #the pipeline should not crash if the user adds some newlines etc to the project file
-                pass
-                
     if args.project:
-        projectName = args.project
-        tmpProject = {}
-        tmpProject[projectName] = projects[projectName]
-        projects = tmpProject  
-    
+        #the user has selected a project manually
+        with open(args.project) as ongoing_fd:
+            projectID=file.split("/")[-1]
+            projectID=file.replace(".txt","")
+            projects[projectID]={};
+            for line in ongoing_fd:
+                try:
+                    if line[0] != "#":
+                        info=line.strip();
+                        info = info.split("\t")
+                        projects[projectID][info[0]]=info[1:]   
+                except:
+                    #the pipeline should not crash if the user adds some newlines etc to the project file
+                    pass 
+    else:  
+        #all projects found in the project dictionary are being analysed
+        for file in os.listdir(os.path.join(programDirectory,"projects")):
+            if file.endswith(".txt") and not file.endswith("example.txt"):
+                with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
+                    projectID=file.split("/")[-1]
+                    projectID=file.replace(".txt","")
+                    projects[projectID]={};
+                    for line in ongoing_fd:
+                        try:
+                            if line[0] != "#":
+                                info=line.strip();
+                                info = info.split("\t")
+                                projects[projectID][info[0]]=info[1:]
+                        except:
+                        #the pipeline should not crash if the user adds some newlines etc to the project file
+                            pass
+        
     # Read the config file
     (working_dir, available_tools, account, exclude,modules,recursive) = readConfigFile.readConfigFile(programDirectory)
     path_to_bam=""
+    default_working_dir=working_dir
     for project in projects:
-        project_path = projects[project]
+        #initiate the project parameters based on the project dictionary
+        project_path = projects[project]["bam"]
         projectName = project
+        #set the output,genmod and frequency db path
+        if not projects[project]["output"]:
+            working_dir = default_working_dir
+        else:
+            working_dir= projects[project]["output"][0]
+            
+        if not projects[project]["genmod"]:
+            genmod_file = os.path.join(programDirectory,"genmod")
+        else:
+            genmod_file=projects[project]["genmod"][0]
+        if not projects[project]["db"]:
+            frequency_db=os.path.join(working_dir, project,"FindSV","database")
+        else:
+            frequency_db=projects[project]["db"][0]
         processFilesPath = os.path.join(working_dir, project,"process")
+        
         #create a directory to keep track of the analysed files
         if not (os.path.exists(processFilesPath)):
             os.makedirs(processFilesPath)
@@ -102,7 +135,6 @@ def main(args):
 
         #search for the projects bam files
         bamfiles=detect_bam_files(project_path, projectName,path_to_bam,recursive)
-
         #function used to find variants
         processFiles= calling.variantCalling(
             programDirectory, project_path, projectName, working_dir, 
@@ -121,11 +153,11 @@ def main(args):
         # Function that filters the variant files and finds genomic features of 
         # the variants
         processFiles = filter.applyFilter(programDirectory, processFiles, 
-                                          processFilesPath, account)
+                                          processFilesPath, account,frequency_db)
 
         #function used to annotate the samples
         processFiles = annotation.annotation(programDirectory, processFiles, 
-                                             processFilesPath, account)
+                                             processFilesPath, account,genmod_file)
 
         #the funciton used for cleaning the vcf file, this is the final step of the pipeline
         processFiles = cleaning.cleaning(programDirectory, processFiles, 

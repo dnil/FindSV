@@ -1,7 +1,7 @@
 import os,subprocess,re,sys
 
 #generates a database from the vcf of a sample analysed with a specified tool
-def submit2Annotation(tools,sample,analysed,programDirectory,account):
+def submit2Annotation(tools,sample,analysed,programDirectory,account,genmod_file):
     sys.path.append(os.path.join(programDirectory,"modules"))  
     import common
     samplePath=os.path.join(analysed[tools]["analysed"][sample]["outpath"],tools)
@@ -25,7 +25,7 @@ def submit2Annotation(tools,sample,analysed,programDirectory,account):
 
 
     #check for a genmod file in the genmod folder
-    path2GenmodFolder=os.path.join(programDirectory,"genmod");
+    path2GenmodFolder=genmod_file;
     genmod="";
     for file in os.listdir(path2GenmodFolder):
         if file.endswith(".ini") or file.endswith(".txt"):    

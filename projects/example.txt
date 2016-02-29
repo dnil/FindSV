@@ -1,5 +1,9 @@
 #this is an example of a project file, the project will be named example
+#here you add the folder of the bam files, multiple folders are separated by tab
 bam	/the/path/to/a/folder/containing/bam/files	/another/other/folder/containing/bam/files
+#the folder containing the genmod file, if this option is left empty, the genmod folder wil be searched
 genmod	/its/optional/to/annotate/using/a/genmod/model/
+#the path to the internal frequency database, if no path is added, the database folder within the output folder will be used
 db	/path/to/the/folder/containing/a/frequency/database/
+#the folder containing all the FindSV output of this project, if left empty, the working_dir of the config file will be used
 output	/path/to/the/folder/of/the/FindSV/output/

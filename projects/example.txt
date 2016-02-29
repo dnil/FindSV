@@ -1,0 +1,5 @@
+#this is an example of a project file, the project will be named example
+bam	/the/path/to/a/folder/containing/bam/files	/another/other/folder/containing/bam/files
+genmod	/its/optional/to/annotate/using/a/genmod/model/
+db	/path/to/the/folder/containing/a/frequency/database/
+output	/path/to/the/folder/of/the/FindSV/output/

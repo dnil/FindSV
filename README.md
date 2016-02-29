@@ -25,23 +25,8 @@ First load python 2.7:
 module load python/2.7
 ```
 
-Before a project can be analysed, it must beadded to the project.txt file. 
-This is a tab separated text file containing the path to the folder were the project folders are located, and the name of the project folder. Each project may consist of multiple folder, these are some examples
-The first line of the ```project.txt``` file is a header line that starts with #. Thus open the ```project.txt``` and add the following lines:
-
-```
-Project1  /home/project/Project1
-
-Project2  /home/project/Project1
-
-Project3  path/to/folder1  path/to/folder2  path/to/foldern
-```
-
-
-If these lines are present in the project.txt file, all samples located in the folders ```/home/project/Project1``` and
-```/home/project/Project2```, aswell as  ``` path/to/folder1  path/to/folder2  path/to/foldern ```
-will be analysed by the pipeline. 
-
+Before a project can be analysed, a project file must be created. An example file is found within the projects folder within the FindSV folder. the extension of the project files must be txt. if no project is specified by the --project option, all projects that have a project file within the projects folder till be analysed.
+By copying the example.txt file and changing the various fields, the user can customise the analysis of different projects.
 
 The pipeline is started using the following command:
 
@@ -61,7 +46,7 @@ to analyse only one of the projects, run the pipeline using the following argume
 python FindSV --run --project runthisproject
 ```
 
-where runthisfolder is the project you wish to run.
+where runthisproject is the path to a project file.
 
 The available tools of the pipeline may be listed using the ```--list``` option:
 ```
@@ -72,7 +57,7 @@ At the moment the available variant callers are:
 - Fermikit
 - FindTranslocations
 - CNVnator
-
+- delly
 
 
 The config file
@@ -84,16 +69,6 @@ sets the output diretory of the pipeline. The output will be stored in subfolder
 
 If ```working_dir``` is set to ```default```, a folder named ```output``` will be created in the FindSV directory
 
--```bamfile_location=```
-
-If the bam files are stored in a sub folder inside each project folder, the subfolder path to the bam files should be given at the ```bamfile_location```. Example:
-
-```
-path/to/project/folders/project1/path/to/bam/1.bam
-path/to/project/folders/project2/path/to/bam/2.bam
-path/to/project/folders/project3/path/to/bam/3.bam
-
-```
 Set ```bamfile_location=path/to/bam``` and ```working_dir=path/to/project/folders```.
 
 -```available_tools=```
@@ -135,17 +110,6 @@ excluded_projects=project1
 ```
 excluded_projects=project1;project2
 ```
-
-The pipeline uses two files to keep track of the analysis of the bam files, the folder of these files is set in the processed line of the config file
-```
-processed=
-```
-Example:
-```
-processed=/home/jesper/files
-```
-now the logs will be kept inside the ```/home/jesper/files``` directory. Processed may also be set to ```default```. Then the logs
-will be stored in the ```FindSV/analysis``` folder.
 
 -```uppmax=```
 Used to enable the uppmax module system(default)

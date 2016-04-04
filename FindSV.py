@@ -75,6 +75,9 @@ def main(args):
             with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
                 projectID=file.split("/")[-1]
                 projectID=file.replace(".txt","")
+                #the user has selected a project manually, and it is not this one
+                #then there is really nothing to do.
+
                 if not (args.project and (args.project != projectID)):
                     projects[projectID]={};
                     for line in ongoing_fd:
@@ -86,10 +89,6 @@ def main(args):
                         except:
                         #the pipeline should not crash if the user adds some newlines etc to the project file
                             pass
-                else:
-                    #the user has selected a project manually, and it is not this one
-                    #then there is really nothing to do.
-                    print "debug: not running {}.".format(projectID)
 
     # Read the config file
     (working_dir, available_tools, account, exclude,modules,recursive) = readConfigFile.readConfigFile(programDirectory)

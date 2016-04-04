@@ -69,28 +69,13 @@ def main(args):
     programDirectory = os.path.dirname(os.path.abspath(__file__))
     #read the project file
     projects = {}
-    if args.project:
-        #the user has selected a project manually
-        with open(args.project) as ongoing_fd:
-            projectID=file.split("/")[-1]
-            projectID=file.replace(".txt","")
-            projects[projectID]={};
-            for line in ongoing_fd:
-                try:
-                    if line[0] != "#":
-                        info=line.strip();
-                        info = info.split("\t")
-                        projects[projectID][info[0]]=info[1:]   
-                except:
-                    #the pipeline should not crash if the user adds some newlines etc to the project file
-                    pass 
-    else:  
-        #all projects found in the project dictionary are being analysed
-        for file in os.listdir(os.path.join(programDirectory,"projects")):
-            if file.endswith(".txt") and not file.endswith("example.txt"):
-                with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
-                    projectID=file.split("/")[-1]
-                    projectID=file.replace(".txt","")
+
+    for file in os.listdir(os.path.join(programDirectory,"projects")):
+        if file.endswith(".txt") and not file.endswith("example.txt"):
+            with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
+                projectID=file.split("/")[-1]
+                projectID=file.replace(".txt","")
+                if not (args.project and (args.project != projectID)):
                     projects[projectID]={};
                     for line in ongoing_fd:
                         try:
@@ -101,7 +86,11 @@ def main(args):
                         except:
                         #the pipeline should not crash if the user adds some newlines etc to the project file
                             pass
-        
+                else:
+                    #the user has selected a project manually, and it is not this one
+                    #then there is really nothing to do.
+                    print "debug: not running {}.".format(projectID)
+
     # Read the config file
     (working_dir, available_tools, account, exclude,modules,recursive) = readConfigFile.readConfigFile(programDirectory)
     path_to_bam=""

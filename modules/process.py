@@ -14,28 +14,13 @@ def restart(programDirectory,step,project,status):
     default_working_dir=working_dir
     print("Restarting:")
     projects = {}
-    if project:
-        #the user has selected a project manually
-        with open(args.project) as ongoing_fd:
-            projectID=file.split("/")[-1]
-            projectID=file.replace(".txt","")
-            projects[projectID]={};
-            for line in ongoing_fd:
-                try:
-                    if line[0] != "#":
-                        info=line.strip();
-                        info = info.split("\t")
-                        projects[projectID][info[0]]=info[1:]   
-                except:
-                    #the pipeline should not crash if the user adds some newlines etc to the project file
-                    pass 
-    else:  
-        #all projects found in the project dictionary are being analysed
-        for file in os.listdir(os.path.join(programDirectory,"projects")):
-            if file.endswith(".txt") and not file.endswith("example.txt"):
-                with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
-                    projectID=file.split("/")[-1]
-                    projectID=file.replace(".txt","")
+    #all projects found in the project dictionary are being analysed
+    for file in os.listdir(os.path.join(programDirectory,"projects")):
+        if file.endswith(".txt") and not file.endswith("example.txt"):
+            with open(os.path.join(programDirectory,"projects" ,file)) as ongoing_fd:
+                projectID=file.split("/")[-1]
+                projectID=file.replace(".txt","")
+                if not (project and (project != projectID)):
                     projects[projectID]={};
                     for line in ongoing_fd:
                         try:
@@ -45,8 +30,11 @@ def restart(programDirectory,step,project,status):
                                 projects[projectID][info[0]]=info[1:]
                         except:
                         #the pipeline should not crash if the user adds some newlines etc to the project file
-                            pass  
-
+                            pass
+                else:
+                    #the user has selected a project manually, and it is not this one
+                    #then there is really nothing to do.
+                    print "debug: not running {}.".format(projectID)
 
     #check if any status file is selected
     restartStatusFiles = []
@@ -69,6 +57,7 @@ def restart(programDirectory,step,project,status):
         else:
             if step["caller"] in available_tools:
                 callerToBeRestarted.append(step["caller"])
+                print "Restarting caller {}.".format(step["caller"])
 
     #restart the callers by removing the status files
     for project in projects:
